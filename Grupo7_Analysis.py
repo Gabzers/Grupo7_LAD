@@ -159,6 +159,8 @@ def analyze_distribution(df, column, title, xlabel, ylabel, bins=30, color='blue
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    if column == 'flow_duration':  # Apply x-axis range only for flow_duration
+        plt.xlim(0, 800)  # Set the range from -10 to 800
     plt.show()
 
 def analyze_correlation(df, selected_features):
@@ -321,7 +323,7 @@ if __name__ == "__main__":
     # Buttons for analysis
     tk.Button(root, text="Summary Statistics", command=lambda: show_summary_statistics(df)).pack(pady=5)
     tk.Button(root, text="Distribution of Flow Duration", command=lambda: analyze_distribution(
-        df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency')).pack(pady=5)
+        df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency', bins=30, color='blue')).pack(pady=5)
 
     # Buttons for individual graphical analyses
     tk.Button(root, text="Distribution of Attack Types", command=lambda: show_attack_type_distribution(df)).pack(pady=5)
