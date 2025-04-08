@@ -381,30 +381,192 @@ if __name__ == "__main__":
 
     root = tk.Tk()
     root.title("Statistical Analysis Interface")
-    root.geometry("400x900")  # Adjusted height for new buttons
+    root.geometry("1200x800")  # Initial size
+    root.configure(bg="white")  # Set background color
 
-    tk.Label(root, text="Statistical Analysis Dashboard", font=("Arial", 16)).pack(pady=10)
+    # Configure grid weights for responsiveness
+    root.grid_rowconfigure(0, weight=1)
+    root.grid_columnconfigure(0, weight=1)
 
-    # Buttons for analysis
-    tk.Button(root, text="Summary Statistics", command=lambda: show_summary_statistics(df)).pack(pady=5)
-    tk.Button(root, text="Distribution of Flow Duration", command=lambda: analyze_distribution(
-        df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency', bins=30, color='blue')).pack(pady=5)
+    # Title Label
+    title_label = tk.Label(
+        root, 
+        text="Statistical Analysis Dashboard", 
+        font=("Arial", 24, "bold"), 
+        bg="lightblue", 
+        fg="black", 
+        pady=15
+    )
+    title_label.pack(fill=tk.X, pady=10)
 
-    # Buttons for individual graphical analyses
-    tk.Button(root, text="Distribution of Attack Types", command=lambda: show_attack_type_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Correlation Heatmap", command=lambda: show_correlation_heatmap(df)).pack(pady=5)
-    tk.Button(root, text="Protocol Distribution", command=lambda: show_protocol_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Packet Size Boxplot", command=lambda: show_packet_size_boxplot(df)).pack(pady=5)
-    tk.Button(root, text="Null Values Distribution", command=lambda: show_null_values_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Average Active Time Distribution", command=lambda: show_active_avg_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Idle Time Boxplot", command=lambda: show_idle_avg_boxplot(df)).pack(pady=5)
-    tk.Button(root, text="Packets vs Payload Relationship", command=lambda: show_packet_vs_payload_scatter(df)).pack(pady=5)
-    tk.Button(root, text="Received Packets vs Flow Duration", command=lambda: show_bwd_pkts_vs_flow_duration(df)).pack(pady=5)
+    # Create a frame for the centered layout
+    main_frame = tk.Frame(root, bg="white")
+    main_frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
 
-    # Buttons for new analyses
-    tk.Button(root, text="Analyze Flags", command=lambda: analyze_flags(df)).pack(pady=5)
-    tk.Button(root, text="Analyze IAT", command=lambda: analyze_iat(df)).pack(pady=5)
-    tk.Button(root, text="Analyze Activity and Idle Times", command=lambda: analyze_activity_idle(df)).pack(pady=5)
-    tk.Button(root, text="Analyze Down/Up Ratio", command=lambda: analyze_down_up_ratio(df)).pack(pady=5)
+    # Configure grid weights for the main frame
+    main_frame.grid_rowconfigure(0, weight=1)
+    main_frame.grid_columnconfigure(0, weight=1)
+    main_frame.grid_columnconfigure(1, weight=1)
+    main_frame.grid_columnconfigure(2, weight=1)
 
+    # Create a grid layout for the three sections
+    general_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    general_column.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
+
+    graphical_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    graphical_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
+
+    advanced_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    advanced_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")
+
+    # General Analysis Section
+    tk.Label(
+        general_column, 
+        text="General Analysis", 
+        font=("Arial", 16, "bold"), 
+        bg="white", 
+        fg="black"
+    ).pack(pady=10)
+    tk.Button(
+        general_column, 
+        text="Summary Statistics", 
+        command=lambda: show_summary_statistics(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        general_column, 
+        text="Distribution of Flow Duration", 
+        command=lambda: analyze_distribution(
+            df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency', bins=30, color='blue'
+        ), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+
+    # Graphical Analyses Section
+    tk.Label(
+        graphical_column, 
+        text="Graphical Analyses", 
+        font=("Arial", 16, "bold"), 
+        bg="white", 
+        fg="black"
+    ).pack(pady=10)
+    tk.Button(
+        graphical_column, 
+        text="Distribution of Attack Types", 
+        command=lambda: show_attack_type_distribution(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Correlation Heatmap", 
+        command=lambda: show_correlation_heatmap(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Protocol Distribution", 
+        command=lambda: show_protocol_distribution(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Packet Size Boxplot", 
+        command=lambda: show_packet_size_boxplot(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Null Values Distribution", 
+        command=lambda: show_null_values_distribution(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Average Active Time Distribution", 
+        command=lambda: show_active_avg_distribution(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Idle Time Boxplot", 
+        command=lambda: show_idle_avg_boxplot(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Packets vs Payload Relationship", 
+        command=lambda: show_packet_vs_payload_scatter(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        graphical_column, 
+        text="Received Packets vs Flow Duration", 
+        command=lambda: show_bwd_pkts_vs_flow_duration(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+
+    # Advanced Analyses Section
+    tk.Label(
+        advanced_column, 
+        text="Advanced Analyses", 
+        font=("Arial", 16, "bold"), 
+        bg="white", 
+        fg="black"
+    ).pack(pady=10)
+    tk.Button(
+        advanced_column, 
+        text="Analyze Flags", 
+        command=lambda: analyze_flags(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        advanced_column, 
+        text="Analyze IAT", 
+        command=lambda: analyze_iat(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        advanced_column, 
+        text="Analyze Activity and Idle Times", 
+        command=lambda: analyze_activity_idle(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        advanced_column, 
+        text="Analyze Down/Up Ratio", 
+        command=lambda: analyze_down_up_ratio(df), 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+
+    # Run the Tkinter main loop
     root.mainloop()
