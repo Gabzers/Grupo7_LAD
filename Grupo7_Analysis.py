@@ -8,138 +8,138 @@ from tkinter import ttk
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Configuração do estilo dos gráficos
+# Configure the style of the plots
 sns.set(style="whitegrid")
 
-# Carregar os dados com validação
+# Load data with validation
 def load_csv(file_path):
-    """Carrega um arquivo CSV para um DataFrame."""
+    """Loads a CSV file into a DataFrame."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file '{file_path}' does not exist. Please provide a valid path.")
     return pd.read_csv(file_path)
 
-# Mostrar informações básicas
+# Show basic information
 def show_basic_info(df):
-    """Exibe informações básicas sobre o dataset."""
-    print("\nInformações básicas:")
+    """Displays basic information about the dataset."""
+    print("\nBasic Information:")
     print(df.info())
-    print("\nPrimeiras linhas do DataFrame:")
+    print("\nFirst rows of the DataFrame:")
     print(df.head())
 
-# Estatísticas descritivas
+# Descriptive statistics
 def describe_dataset(df):
-    """Mostra estatísticas descritivas do dataset."""
-    print("\nEstatísticas Descritivas:")
+    """Displays descriptive statistics of the dataset."""
+    print("\nDescriptive Statistics:")
     print(df.describe(include='all'))
-    print("\nValores Nulos por Coluna:")
+    print("\nNull Values by Column:")
     print(df.isnull().sum())
 
-# Análise gráfica
+# Graphical analysis
 def graphical_analysis(df):
-    """Realiza a análise gráfica com 5 visualizações principais."""
-    # 1. Distribuição dos tipos de ataque
+    """Performs graphical analysis with 5 main visualizations."""
+    # 1. Distribution of attack types
     plt.figure(figsize=(12, 6))
     sns.countplot(data=df, y="Attack_type", order=df["Attack_type"].value_counts().index, palette="coolwarm")
-    plt.title("Distribuição dos Tipos de Ataque")
-    plt.xlabel("Número de Ocorrências")
-    plt.ylabel("Tipo de Ataque")
+    plt.title("Distribution of Attack Types")
+    plt.xlabel("Number of Occurrences")
+    plt.ylabel("Attack Type")
     plt.show()
     
-    # 2. Heatmap de correlação entre features numéricas
+    # 2. Correlation heatmap for numerical features
     plt.figure(figsize=(10, 8))
     selected_features = ["flow_duration", "fwd_pkts_tot", "bwd_pkts_tot", "flow_pkts_per_sec",
                          "payload_bytes_per_second", "idle.avg", "active.avg"]
     corr_matrix = df[selected_features].corr()
     sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-    plt.title("Matriz de Correlação entre Features Selecionadas")
+    plt.title("Correlation Matrix for Selected Features")
     plt.show()
     
-    # 3. Distribuição dos pacotes por protocolo
+    # 3. Distribution of packets by protocol
     plt.figure(figsize=(12, 6))
     df["proto"].value_counts().head(10).plot(kind="pie", autopct="%1.1f%%", cmap="tab10", startangle=90)
-    plt.title("Distribuição dos Protocolos de Rede (Top 10)")
+    plt.title("Distribution of Network Protocols (Top 10)")
     plt.ylabel("")
     plt.show()
     
-    # 4. Distribuição do fluxo de duração
+    # 4. Distribution of flow duration
     plt.figure(figsize=(12, 6))
     sns.histplot(df["flow_duration"], bins=50, kde=True, color="blue")
-    plt.title("Distribuição da Duração do Fluxo de Rede")
-    plt.xlabel("Duração do Fluxo")
-    plt.ylabel("Frequência")
+    plt.title("Distribution of Network Flow Duration")
+    plt.xlabel("Flow Duration")
+    plt.ylabel("Frequency")
     plt.show()
     
-    # 5. Boxplot do tamanho de pacotes enviados
+    # 5. Boxplot of packet sizes sent
     plt.figure(figsize=(12, 6))
     sns.boxplot(data=df, x="Attack_type", y="fwd_pkts_payload.tot", palette="coolwarm")
     plt.ylim(0, df["fwd_pkts_payload.tot"].quantile(0.99))
-    plt.title("Distribuição do Tamanho de Pacotes Enviados por Tipo de Ataque")
+    plt.title("Distribution of Packet Sizes Sent by Attack Type")
     plt.xticks(rotation=90)
     plt.show()
 
 # Additional graphical analyses
 def additional_graphical_analysis(df):
-    """Realiza análises gráficas adicionais baseadas no dataset."""
-    # 1. Distribuição de valores nulos por coluna (ajustada para evitar sobrecarga visual)
+    """Performs additional graphical analyses based on the dataset."""
+    # 1. Distribution of null values by column (adjusted to avoid visual overload)
     null_counts = df.isnull().sum().sort_values(ascending=False)
-    top_nulls = null_counts[null_counts > 0].head(10)  # Mostrar apenas as 10 colunas com mais valores nulos
-    others_count = null_counts[null_counts > 0][10:].sum()  # Agregar o restante em "Outros"
+    top_nulls = null_counts[null_counts > 0].head(10)  # Show only the top 10 columns with the most null values
+    others_count = null_counts[null_counts > 0][10:].sum()  # Aggregate the rest as "Others"
     
     if others_count > 0:
-        top_nulls["Outros"] = others_count
+        top_nulls["Others"] = others_count
 
     plt.figure(figsize=(12, 6))
     top_nulls.plot(kind="bar", color="orange")
-    plt.title("Distribuição de Valores Nulos por Coluna (Top 10)")
-    plt.xlabel("Colunas")
-    plt.ylabel("Número de Valores Nulos")
+    plt.title("Distribution of Null Values by Column (Top 10)")
+    plt.xlabel("Columns")
+    plt.ylabel("Number of Null Values")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.show()
 
-    # 2. Top 10 valores únicos em 'proto' (ajustada para evitar sobrecarga visual)
+    # 2. Top 10 unique values in 'proto' (adjusted to avoid visual overload)
     proto_counts = df["proto"].value_counts()
-    top_protos = proto_counts.head(10)  # Mostrar apenas os 10 protocolos mais frequentes
-    others_proto_count = proto_counts[10:].sum()  # Agregar o restante em "Outros"
+    top_protos = proto_counts.head(10)  # Show only the top 10 most frequent protocols
+    others_proto_count = proto_counts[10:].sum()  # Aggregate the rest as "Others"
     
     if others_proto_count > 0:
-        top_protos["Outros"] = others_proto_count
+        top_protos["Others"] = others_proto_count
 
     plt.figure(figsize=(12, 6))
     top_protos.plot(kind="bar", color="green")
-    plt.title("Top 10 Protocolos de Rede (Com Outros Agregados)")
-    plt.xlabel("Protocolo")
-    plt.ylabel("Frequência")
+    plt.title("Top 10 Network Protocols (With Others Aggregated)")
+    plt.xlabel("Protocol")
+    plt.ylabel("Frequency")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.show()
 
-    # 3. Relação entre 'flow_duration' e 'fwd_pkts_tot' (ajustada para evitar sobreposição)
+    # 3. Relationship between 'flow_duration' and 'fwd_pkts_tot' (adjusted to avoid overlap)
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=df, x="flow_duration", y="fwd_pkts_tot", hue="Attack_type", palette="coolwarm", alpha=0.5)
-    plt.title("Relação entre Duração do Fluxo e Pacotes Enviados")
-    plt.xlabel("Duração do Fluxo")
-    plt.ylabel("Pacotes Enviados (Total)")
-    plt.legend(title="Tipo de Ataque", bbox_to_anchor=(1.05, 1), loc="upper left")  # Ajustar a legenda
+    plt.title("Relationship Between Flow Duration and Packets Sent")
+    plt.xlabel("Flow Duration")
+    plt.ylabel("Packets Sent (Total)")
+    plt.legend(title="Attack Type", bbox_to_anchor=(1.05, 1), loc="upper left")  # Adjust legend
     plt.tight_layout()
     plt.show()
 
-    # 4. Boxplot de 'payload_bytes_per_second' por 'Attack_type' (ajustada para evitar outliers extremos)
+    # 4. Boxplot of 'payload_bytes_per_second' by 'Attack_type' (adjusted to avoid extreme outliers)
     plt.figure(figsize=(12, 6))
     sns.boxplot(data=df, x="Attack_type", y="payload_bytes_per_second", palette="viridis", showfliers=False)
-    plt.title("Distribuição de Payload por Tipo de Ataque (Sem Outliers)")
-    plt.xlabel("Tipo de Ataque")
-    plt.ylabel("Payload (Bytes por Segundo)")
+    plt.title("Payload Distribution by Attack Type (Without Outliers)")
+    plt.xlabel("Attack Type")
+    plt.ylabel("Payload (Bytes per Second)")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.show()
 
-    # 5. Distribuição de 'idle.avg' com KDE (ajustada para evitar sobrecarga visual)
+    # 5. Distribution of 'idle.avg' with KDE (adjusted to avoid visual overload)
     plt.figure(figsize=(10, 6))
-    sns.kdeplot(df["idle.avg"], shade=True, color="purple", bw_adjust=0.5)  # Ajustar suavização
-    plt.title("Distribuição de Tempo Ocioso Médio")
-    plt.xlabel("Idle (Média)")
-    plt.ylabel("Densidade")
+    sns.kdeplot(df["idle.avg"], shade=True, color="purple", bw_adjust=0.5)  # Adjust smoothing
+    plt.title("Distribution of Average Idle Time")
+    plt.xlabel("Idle (Average)")
+    plt.ylabel("Density")
     plt.tight_layout()
     plt.show()
 
@@ -170,7 +170,7 @@ def analyze_correlation(df, selected_features):
 
 # Tkinter GUI for analysis
 def show_summary_statistics(df):
-    """Exibe estatísticas descritivas com explicações intuitivas."""
+    """Displays descriptive statistics with intuitive explanations."""
     stats = perform_statistical_analysis(df)
     stats = stats.round(1)  # Round all numeric values to one decimal place
     stats.insert(0, "Variable", stats.index)  # Add a "Variable" column for clarity
@@ -180,25 +180,25 @@ def show_summary_statistics(df):
 
     # Add explanations for each metric
     explanations = {
-        "Variable": "Nome da variável (coluna do dataset)",
-        "count": "Número de valores não nulos",
-        "mean": "Média (valor médio)",
-        "std": "Desvio padrão (dispersão dos dados)",
-        "min": "Valor mínimo",
-        "25%": "Primeiro quartil (25% dos dados abaixo deste valor)",
-        "50%": "Mediana (50% dos dados abaixo deste valor)",
-        "75%": "Terceiro quartil (75% dos dados abaixo deste valor)",
-        "max": "Valor máximo",
-        "range": "Intervalo (máximo - mínimo)",
-        "variance": "Variância (dispersão dos dados)",
-        "mode": "Moda (valor mais frequente)"
+        "Variable": "Name of the variable (dataset column)",
+        "count": "Number of non-null values",
+        "mean": "Mean (average value)",
+        "std": "Standard deviation (data dispersion)",
+        "min": "Minimum value",
+        "25%": "First quartile (25% of data below this value)",
+        "50%": "Median (50% of data below this value)",
+        "75%": "Third quartile (75% of data below this value)",
+        "max": "Maximum value",
+        "range": "Range (max - min)",
+        "variance": "Variance (data dispersion)",
+        "mode": "Mode (most frequent value)"
     }
 
     # Create a frame for explanations
     explanation_frame = tk.Frame(stats_window)
     explanation_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
-    tk.Label(explanation_frame, text="Explicações das Estatísticas:", font=("Arial", 12, "bold")).pack(anchor="w")
+    tk.Label(explanation_frame, text="Explanations of Statistics:", font=("Arial", 12, "bold")).pack(anchor="w")
     for metric, explanation in explanations.items():
         tk.Label(explanation_frame, text=f"{metric}: {explanation}", font=("Arial", 10)).pack(anchor="w")
 
@@ -233,9 +233,9 @@ def show_distribution(df, column, title, xlabel, ylabel):
 def show_attack_type_distribution(df):
     plt.figure(figsize=(12, 6))
     sns.countplot(data=df, y="Attack_type", order=df["Attack_type"].value_counts().index, palette="coolwarm")
-    plt.title("Distribuição dos Tipos de Ataque")
-    plt.xlabel("Número de Ocorrências")
-    plt.ylabel("Tipo de Ataque")
+    plt.title("Distribution of Attack Types")
+    plt.xlabel("Number of Occurrences")
+    plt.ylabel("Attack Type")
     plt.show()
 
 def show_correlation_heatmap(df):
@@ -244,75 +244,75 @@ def show_correlation_heatmap(df):
                          "payload_bytes_per_second", "idle.avg", "active.avg"]
     corr_matrix = df[selected_features].corr()
     sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-    plt.title("Matriz de Correlação entre Features Selecionadas")
+    plt.title("Correlation Matrix for Selected Features")
     plt.show()
 
 def show_protocol_distribution(df):
     plt.figure(figsize=(12, 6))
     df["proto"].value_counts().head(10).plot(kind="pie", autopct="%1.1f%%", cmap="tab10", startangle=90)
-    plt.title("Distribuição dos Protocolos de Rede (Top 10)")
+    plt.title("Distribution of Network Protocols (Top 10)")
     plt.ylabel("")
     plt.show()
 
 def show_flow_duration_distribution(df):
     plt.figure(figsize=(12, 6))
     sns.histplot(df["flow_duration"], bins=50, kde=True, color="blue")
-    plt.title("Distribuição da Duração do Fluxo de Rede")
-    plt.xlabel("Duração do Fluxo")
-    plt.ylabel("Frequência")
+    plt.title("Distribution of Network Flow Duration")
+    plt.xlabel("Flow Duration")
+    plt.ylabel("Frequency")
     plt.show()
 
 def show_packet_size_boxplot(df):
     plt.figure(figsize=(12, 6))
     sns.boxplot(data=df, x="Attack_type", y="fwd_pkts_payload.tot", palette="coolwarm")
     plt.ylim(0, df["fwd_pkts_payload.tot"].quantile(0.99))
-    plt.title("Distribuição do Tamanho de Pacotes Enviados por Tipo de Ataque")
+    plt.title("Distribution of Packet Sizes Sent by Attack Type")
     plt.xticks(rotation=90)
     plt.show()
 
 def show_null_values_distribution(df):
     plt.figure(figsize=(12, 6))
     df.isnull().sum().sort_values(ascending=False).plot(kind="bar", color="orange")
-    plt.title("Distribuição de Valores Nulos por Coluna")
-    plt.xlabel("Colunas")
-    plt.ylabel("Número de Valores Nulos")
+    plt.title("Distribution of Null Values by Column")
+    plt.xlabel("Columns")
+    plt.ylabel("Number of Null Values")
     plt.xticks(rotation=45)
     plt.show()
 
 def show_active_avg_distribution(df):
     plt.figure(figsize=(10, 6))
     sns.kdeplot(df["active.avg"], shade=True, color="red")
-    plt.title("Distribuição de Tempo Ativo Médio")
-    plt.xlabel("Active (Média)")
-    plt.ylabel("Densidade")
+    plt.title("Distribution of Average Active Time")
+    plt.xlabel("Active (Average)")
+    plt.ylabel("Density")
     plt.show()
 
 def show_idle_avg_boxplot(df):
     plt.figure(figsize=(12, 6))
     sns.boxplot(data=df, x="proto", y="idle.avg", palette="Set2")
     plt.ylim(0, df["idle.avg"].quantile(0.99))
-    plt.title("Distribuição de Tempo Ocioso por Protocolo")
-    plt.xlabel("Protocolo")
-    plt.ylabel("Idle (Média)")
+    plt.title("Distribution of Idle Time by Protocol")
+    plt.xlabel("Protocol")
+    plt.ylabel("Idle (Average)")
     plt.xticks(rotation=45)
     plt.show()
 
 def show_packet_vs_payload_scatter(df):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=df, x="flow_pkts_per_sec", y="payload_bytes_per_second", hue="Attack_type", palette="coolwarm", alpha=0.7)
-    plt.title("Relação entre Pacotes por Segundo e Payload por Segundo")
-    plt.xlabel("Pacotes por Segundo")
-    plt.ylabel("Payload (Bytes por Segundo)")
-    plt.legend(title="Tipo de Ataque")
+    plt.title("Relationship Between Packets per Second and Payload per Second")
+    plt.xlabel("Packets per Second")
+    plt.ylabel("Payload (Bytes per Second)")
+    plt.legend(title="Attack Type")
     plt.show()
 
 def show_bwd_pkts_vs_flow_duration(df):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=df, x="bwd_pkts_tot", y="flow_duration", hue="Attack_type", palette="coolwarm", alpha=0.7)
-    plt.title("Relação entre Pacotes Recebidos e Duração do Fluxo")
-    plt.xlabel("Pacotes Recebidos (Total)")
-    plt.ylabel("Duração do Fluxo")
-    plt.legend(title="Tipo de Ataque")
+    plt.title("Relationship Between Received Packets and Flow Duration")
+    plt.xlabel("Received Packets (Total)")
+    plt.ylabel("Flow Duration")
+    plt.legend(title="Attack Type")
     plt.show()
 
 # Main Tkinter window
@@ -331,15 +331,15 @@ if __name__ == "__main__":
     tk.Button(root, text="Distribution of Flow Duration", command=lambda: show_distribution(df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency')).pack(pady=5)
 
     # Buttons for individual graphical analyses
-    tk.Button(root, text="Distribuição dos Tipos de Ataque", command=lambda: show_attack_type_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Heatmap de Correlação", command=lambda: show_correlation_heatmap(df)).pack(pady=5)
-    tk.Button(root, text="Distribuição de Protocolos", command=lambda: show_protocol_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Distribuição da Duração do Fluxo", command=lambda: show_flow_duration_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Boxplot do Tamanho de Pacotes", command=lambda: show_packet_size_boxplot(df)).pack(pady=5)
-    tk.Button(root, text="Distribuição de Valores Nulos", command=lambda: show_null_values_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Distribuição de Tempo Ativo Médio", command=lambda: show_active_avg_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Boxplot de Tempo Ocioso", command=lambda: show_idle_avg_boxplot(df)).pack(pady=5)
-    tk.Button(root, text="Relação Pacotes vs Payload", command=lambda: show_packet_vs_payload_scatter(df)).pack(pady=5)
-    tk.Button(root, text="Relação Pacotes Recebidos vs Duração", command=lambda: show_bwd_pkts_vs_flow_duration(df)).pack(pady=5)
+    tk.Button(root, text="Distribution of Attack Types", command=lambda: show_attack_type_distribution(df)).pack(pady=5)
+    tk.Button(root, text="Correlation Heatmap", command=lambda: show_correlation_heatmap(df)).pack(pady=5)
+    tk.Button(root, text="Protocol Distribution", command=lambda: show_protocol_distribution(df)).pack(pady=5)
+    tk.Button(root, text="Flow Duration Distribution", command=lambda: show_flow_duration_distribution(df)).pack(pady=5)
+    tk.Button(root, text="Packet Size Boxplot", command=lambda: show_packet_size_boxplot(df)).pack(pady=5)
+    tk.Button(root, text="Null Values Distribution", command=lambda: show_null_values_distribution(df)).pack(pady=5)
+    tk.Button(root, text="Average Active Time Distribution", command=lambda: show_active_avg_distribution(df)).pack(pady=5)
+    tk.Button(root, text="Idle Time Boxplot", command=lambda: show_idle_avg_boxplot(df)).pack(pady=5)
+    tk.Button(root, text="Packets vs Payload Relationship", command=lambda: show_packet_vs_payload_scatter(df)).pack(pady=5)
+    tk.Button(root, text="Received Packets vs Flow Duration", command=lambda: show_bwd_pkts_vs_flow_duration(df)).pack(pady=5)
 
     root.mainloop()
