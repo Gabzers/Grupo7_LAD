@@ -254,14 +254,6 @@ def show_protocol_distribution(df):
     plt.ylabel("")
     plt.show()
 
-def show_flow_duration_distribution(df):
-    plt.figure(figsize=(12, 6))
-    sns.histplot(df["flow_duration"], bins=50, kde=True, color="blue")
-    plt.title("Distribution of Network Flow Duration")
-    plt.xlabel("Flow Duration")
-    plt.ylabel("Frequency")
-    plt.show()
-
 def show_packet_size_boxplot(df):
     plt.figure(figsize=(12, 6))
     sns.boxplot(data=df, x="Attack_type", y="fwd_pkts_payload.tot", palette="coolwarm")
@@ -328,13 +320,13 @@ if __name__ == "__main__":
 
     # Buttons for analysis
     tk.Button(root, text="Summary Statistics", command=lambda: show_summary_statistics(df)).pack(pady=5)
-    tk.Button(root, text="Distribution of Flow Duration", command=lambda: show_distribution(df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency')).pack(pady=5)
+    tk.Button(root, text="Distribution of Flow Duration", command=lambda: analyze_distribution(
+        df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency')).pack(pady=5)
 
     # Buttons for individual graphical analyses
     tk.Button(root, text="Distribution of Attack Types", command=lambda: show_attack_type_distribution(df)).pack(pady=5)
     tk.Button(root, text="Correlation Heatmap", command=lambda: show_correlation_heatmap(df)).pack(pady=5)
     tk.Button(root, text="Protocol Distribution", command=lambda: show_protocol_distribution(df)).pack(pady=5)
-    tk.Button(root, text="Flow Duration Distribution", command=lambda: show_flow_duration_distribution(df)).pack(pady=5)
     tk.Button(root, text="Packet Size Boxplot", command=lambda: show_packet_size_boxplot(df)).pack(pady=5)
     tk.Button(root, text="Null Values Distribution", command=lambda: show_null_values_distribution(df)).pack(pady=5)
     tk.Button(root, text="Average Active Time Distribution", command=lambda: show_active_avg_distribution(df)).pack(pady=5)
