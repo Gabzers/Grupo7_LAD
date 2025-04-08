@@ -309,14 +309,79 @@ def show_bwd_pkts_vs_flow_duration(df):
     plt.legend(title="Attack Type")
     plt.show()
 
+# Add down_up_ratio calculation
+def calculate_down_up_ratio(df):
+    """Calculates the down/up ratio for the dataset."""
+    df['down_up_ratio'] = df['bwd_pkts_tot'] / (df['fwd_pkts_tot'] + 1e-9)  # Avoid division by zero
+    return df
+
+# Add analysis for flags
+def analyze_flags(df):
+    """Analyzes the distribution of flags in the dataset."""
+    flag_columns = ['flow_SYN_flag_count', 'flow_RST_flag_count', 'flow_FIN_flag_count', 
+                    'fwd_PSH_flag_count', 'bwd_PSH_flag_count', 'flow_ACK_flag_count', 
+                    'fwd_URG_flag_count', 'bwd_URG_flag_count', 'flow_CWR_flag_count', 
+                    'flow_ECE_flag_count']
+    flag_sums = df[flag_columns].sum()
+    plt.figure(figsize=(12, 6))
+    flag_sums.plot(kind="bar", color="teal")
+    plt.title("Distribution of Flags")
+    plt.xlabel("Flags")
+    plt.ylabel("Count")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.show()
+
+# Add analysis for IAT
+def analyze_iat(df):
+    """Analyzes the distribution of Inter-Arrival Times (IAT)."""
+    iat_columns = ['fwd_iat.avg', 'fwd_iat.std', 'bwd_iat.avg', 'bwd_iat.std']
+    for col in iat_columns:
+        plt.figure(figsize=(10, 6))
+        sns.kdeplot(df[col], shade=True, bw_adjust=0.5)
+        plt.title(f"Distribution of {col}")
+        plt.xlabel(col)
+        plt.ylabel("Density")
+        if col == 'fwd_iat.avg':  # Apply range adjustment only for fwd_iat.avg
+            plt.xlim(0, 0.25 * 1e8)
+        plt.tight_layout()
+        plt.show()
+
+# Add analysis for activity and idle times
+def analyze_activity_idle(df):
+    """Analyzes the activity and idle times in the dataset."""
+    activity_columns = ['active.avg', 'active.tot', 'idle.avg', 'idle.tot']
+    for col in activity_columns:
+        plt.figure(figsize=(10, 6))
+        sns.kdeplot(df[col], shade=True, bw_adjust=0.5)
+        plt.title(f"Distribution of {col}")
+        plt.xlabel(col)
+        plt.ylabel("Density")
+        plt.tight_layout()
+        plt.show()
+
+# Add analysis for down/up ratio
+def analyze_down_up_ratio(df):
+    """Analyzes the distribution of the down/up ratio."""
+    plt.figure(figsize=(10, 6))
+    sns.histplot(df['down_up_ratio'], kde=True, bins=30, color='purple')
+    plt.title("Distribution of Down/Up Ratio")
+    plt.xlabel("Down/Up Ratio")
+    plt.ylabel("Frequency")
+    plt.tight_layout()
+    plt.show()
+
 # Main Tkinter window
 if __name__ == "__main__":
     file_path = os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv")
     df = load_csv(file_path)
 
+    # Calculate down/up ratio
+    df = calculate_down_up_ratio(df)
+
     root = tk.Tk()
     root.title("Statistical Analysis Interface")
-    root.geometry("400x800")
+    root.geometry("400x900")  # Adjusted height for new buttons
 
     tk.Label(root, text="Statistical Analysis Dashboard", font=("Arial", 16)).pack(pady=10)
 
@@ -335,5 +400,11 @@ if __name__ == "__main__":
     tk.Button(root, text="Idle Time Boxplot", command=lambda: show_idle_avg_boxplot(df)).pack(pady=5)
     tk.Button(root, text="Packets vs Payload Relationship", command=lambda: show_packet_vs_payload_scatter(df)).pack(pady=5)
     tk.Button(root, text="Received Packets vs Flow Duration", command=lambda: show_bwd_pkts_vs_flow_duration(df)).pack(pady=5)
+
+    # Buttons for new analyses
+    tk.Button(root, text="Analyze Flags", command=lambda: analyze_flags(df)).pack(pady=5)
+    tk.Button(root, text="Analyze IAT", command=lambda: analyze_iat(df)).pack(pady=5)
+    tk.Button(root, text="Analyze Activity and Idle Times", command=lambda: analyze_activity_idle(df)).pack(pady=5)
+    tk.Button(root, text="Analyze Down/Up Ratio", command=lambda: analyze_down_up_ratio(df)).pack(pady=5)
 
     root.mainloop()
