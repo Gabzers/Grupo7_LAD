@@ -434,20 +434,35 @@ def calculate_down_up_ratio(df):
 
 # Add analysis for flags
 def analyze_flags(df):
-    """Analyzes the distribution of flags in the dataset."""
+    """Analyzes the distribution of flags in the dataset with bar plots."""
     flag_columns = ['flow_SYN_flag_count', 'flow_RST_flag_count', 'flow_FIN_flag_count', 
                     'fwd_PSH_flag_count', 'bwd_PSH_flag_count', 'flow_ACK_flag_count', 
                     'fwd_URG_flag_count', 'bwd_URG_flag_count', 'flow_CWR_flag_count', 
                     'flow_ECE_flag_count']
+    flag_labels = {
+        'flow_SYN_flag_count': 'SYN Flag',
+        'flow_RST_flag_count': 'RST Flag',
+        'flow_FIN_flag_count': 'FIN Flag',
+        'fwd_PSH_flag_count': 'FWD PSH Flag',
+        'bwd_PSH_flag_count': 'BWD PSH Flag',
+        'flow_ACK_flag_count': 'ACK Flag',
+        'fwd_URG_flag_count': 'FWD URG Flag',
+        'bwd_URG_flag_count': 'BWD URG Flag',
+        'flow_CWR_flag_count': 'CWR Flag',
+        'flow_ECE_flag_count': 'ECE Flag'
+    }
+    
     flag_sums = df[flag_columns].sum()
     plt.figure(figsize=(12, 6))
-    flag_sums.plot(kind="bar", color="teal")
-    plt.title("Distribution of Flags")
-    plt.xlabel("Flags")
-    plt.ylabel("Count")
-    plt.xticks(rotation=45, ha="right")
+    flag_sums.rename(flag_labels).plot(kind="bar", color="teal")
+    plt.title("Distribution of TCP Flags", fontsize=16, fontweight='bold')
+    plt.xlabel("Flags", fontsize=14)
+    plt.ylabel("Count", fontsize=14)
+    plt.xticks(rotation=45, ha="right", fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
     plt.show()
+
 
 # Add analysis for IAT
 def analyze_iat(df):
@@ -499,14 +514,17 @@ def analyze_activity_idle(df):
 
 # Add analysis for down/up ratio
 def analyze_down_up_ratio(df):
-    """Analyzes the distribution of the down/up ratio."""
+    """Analyzes the distribution of the down/up ratio with a clean histogram."""
     plt.figure(figsize=(10, 6))
-    sns.histplot(df['down_up_ratio'], kde=True, bins=30, color='purple')
-    plt.title("Distribution of Down/Up Ratio")
-    plt.xlabel("Down/Up Ratio")
-    plt.ylabel("Frequency")
+    sns.histplot(df['down_up_ratio'], kde=True, bins=30, color='purple', label='Down/Up Ratio')
+    plt.title("Distribution of Down/Up Ratio", fontsize=16, fontweight='bold')
+    plt.xlabel("Down/Up Ratio (Packets Received/Sent)", fontsize=14)
+    plt.ylabel("Frequency", fontsize=14)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(fontsize=12)
     plt.tight_layout()
     plt.show()
+
 
 def show_dataset_characteristics():
     """Displays the characteristics of the dataset in a maximizable window."""
