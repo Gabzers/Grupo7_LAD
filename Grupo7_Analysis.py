@@ -231,7 +231,7 @@ def show_distribution(df, column, title, xlabel, ylabel):
 # Functions for individual graphical Analysis
 def show_attack_type_distribution(df):
     """Displays the distribution of attack types."""
-    plt.figure(figsize=(12, 8))  # Ajustei o tamanho da figura para maior clareza
+    plt.figure(figsize=(12, 8))  # Increased figure size for better clarity
     sns.countplot(
         data=df, 
         y="Attack_type", 
@@ -239,24 +239,54 @@ def show_attack_type_distribution(df):
         palette="coolwarm"
     )
     
-    # Títulos e rótulos melhorados
-    plt.title("Distribuição dos Tipos de Ataques", fontsize=14, fontweight="bold")
-    plt.xlabel("Número de Ocorrências", fontsize=12)
-    plt.ylabel("Tipo de Ataque", fontsize=12)
+    # Enhanced titles and labels
+    plt.title("Distribution of Attack Types", fontsize=14, fontweight="bold")
+    plt.xlabel("Number of Occurrences", fontsize=12)
+    plt.ylabel("Attack Type", fontsize=12)
     
-    # Ajuste para evitar sobreposição de elementos
+    # Layout adjustment to prevent element overlap
     plt.tight_layout()
 
     plt.show()
 
 def show_correlation_heatmap(df):
-    plt.figure(figsize=(10, 8))
-    selected_features = ["flow_duration", "fwd_pkts_tot", "bwd_pkts_tot", "flow_pkts_per_sec",
-                         "payload_bytes_per_second", "idle.avg", "active.avg"]
+    """Displays the correlation matrix for selected features."""
+    plt.figure(figsize=(12, 10))  # Increased size for better visualization
+
+    selected_features = [
+        "flow_duration", 
+        "fwd_pkts_tot", 
+        "bwd_pkts_tot", 
+        "flow_pkts_per_sec", 
+        "payload_bytes_per_second", 
+        "idle.avg", 
+        "active.avg"
+    ]
+    
+    # Calculate the correlation matrix
     corr_matrix = df[selected_features].corr()
-    sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-    plt.title("Correlation Matrix for Selected Features")
+    
+    # Create the heatmap with enhanced settings
+    sns.heatmap(
+        corr_matrix, 
+        annot=True, 
+        cmap="coolwarm", 
+        fmt=".2f", 
+        linewidths=0.5, 
+        cbar_kws={"label": "Correlation Coefficient"}  # Add label to color bar
+    )
+    
+    # Rotate X-axis labels
+    plt.xticks(rotation=45)
+
+    # Enhanced titles and layout
+    plt.title("Correlation Matrix for Selected Features", fontsize=14, fontweight="bold")
+    plt.xlabel("Features", fontsize=12)
+    plt.ylabel("Features", fontsize=12)
+    plt.tight_layout()  # Adjust layout to prevent overlap
+    
     plt.show()
+
 
 import matplotlib.pyplot as plt
 
@@ -264,35 +294,57 @@ def show_protocol_distribution(df):
     """Displays the distribution of network protocols."""
     plt.figure(figsize=(12, 6))
     
-    # Cria um gráfico de pizza com ajustes para maior legibilidade
+    # Create a pie chart with adjustments for better readability
     df["proto"].value_counts().head(10).plot.pie(
         autopct="%1.1f%%", 
         cmap="tab10", 
         startangle=90,
-        pctdistance=0.85  # Ajusta a posição do percentual para melhor visibilidade
+        pctdistance=0.85  # Adjust the position of the percentage for better visibility
     )
     
-    plt.title("Distribuição dos Protocolos de Rede", fontsize=14, fontweight="bold")
-    plt.ylabel("")  # Remove o rótulo do eixo Y
-    plt.legend(title="Protocolos", loc="center left", bbox_to_anchor=(1, 0.5))  # Adiciona uma legenda clara
-    plt.tight_layout()  # Ajusta o layout para evitar sobreposição
+    plt.title("Distribution of Network Protocols", fontsize=14, fontweight="bold")
+    plt.ylabel("")  # Remove the Y-axis label
+    plt.legend(title="Protocols", loc="center left", bbox_to_anchor=(1, 0.5))  # Add a clear legend
+    plt.tight_layout()  # Adjust the layout to avoid overlap
     plt.show()
 
 
 def show_packet_size_barplots(df):
-    """Displays individual bar plots for each variable related to packet sizes."""
+    """Displays enhanced bar plots for packet size variables by attack type."""
     variables = ['fwd_pkts_payload.tot', 'bwd_pkts_payload.tot', 'fwd_pkts_tot', 'bwd_pkts_tot']
+    
     for var in variables:
-        plt.figure(figsize=(12, 6))
+        plt.figure(figsize=(14, 8))  # Increased figure size for better visibility
         avg_packet_size = df.groupby("Attack_type")[var].mean().sort_values(ascending=False)
-        avg_packet_size.plot(kind="bar", color="skyblue")
-        plt.title(f"Average {var.replace('_', ' ').title()} by Attack Type")
-        plt.xlabel("Attack Type")
-        plt.ylabel(var.replace('_', ' ').title())
-        plt.xticks(rotation=45, ha="right")
-        plt.tight_layout()
+        
+        avg_packet_size.plot(
+            kind="bar", 
+            color="skyblue", 
+            edgecolor="black"  # Added edges for better element definition
+        )
+        
+        # Enhanced titles and labels
+        plt.title(f"Average of {var.replace('_', ' ').title()} by Attack Type", fontsize=16, fontweight="bold")
+        plt.xlabel("Attack Type", fontsize=14)
+        plt.ylabel(f"Average of {var.replace('_', ' ').title()}", fontsize=14)
+        
+        # Better label readability
+        plt.xticks(rotation=45, ha="right", fontsize=12)
+        plt.yticks(fontsize=12)
+        
+        # Add description to the graph
+        plt.text(
+            0.95, 0.01, 
+            "Analysis of data grouped by attack type", 
+            fontsize=10, 
+            transform=plt.gcf().transFigure, 
+            ha="right"
+        )
+        
+        plt.tight_layout()  # Adjust layout to avoid overlaps
         plt.show()
-        plt.close()  # Close the plot after displaying it
+        plt.close()  # Close the plot to free memory
+
 
 def show_active_avg_distribution(df):
     plt.figure(figsize=(10, 6))
@@ -323,22 +375,24 @@ def show_packet_vs_payload_scatter(df):
     plt.legend(title="Attack Type")
     plt.show()
 
-def show_bwd_pkts_vs_flow_duration(df):
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(
-        data=df,
-        x="bwd_pkts_tot",
-        y="flow_duration",
-        hue="Attack_type",
-        palette="coolwarm",
-        alpha=0.7
+def show_hexbin_only(df):
+    plt.figure(figsize=(12, 8))
+    plt.hexbin(
+        df["bwd_pkts_tot"],
+        df["flow_duration"],
+        gridsize=50,
+        cmap="coolwarm",
+        bins='log'
     )
-    plt.title("Relationship Between Received Packets and Flow Duration")
-    plt.xlabel("Received Packets (Total)")
-    plt.ylabel("Flow Duration")
-    plt.legend(title="Attack Type", bbox_to_anchor=(1.05, 1), loc="upper left")  # Adjust legend position
+    plt.colorbar(label='Contagem de Fluxos (log)')
+    plt.title("Densidade entre Pacotes Recebidos e Duração do Fluxo", fontsize=16, fontweight="bold")
+    plt.xlabel("Pacotes Recebidos (Total)", fontsize=14)
+    plt.ylabel("Duração do Fluxo", fontsize=14)
     plt.tight_layout()
     plt.show()
+
+
+
 
 def analyze_each_graph():
     """Provides an analysis of each graph and its insights."""
@@ -860,12 +914,14 @@ if __name__ == "__main__":
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
+    # Botão para o HEXBIN
     ttk.Button(
         graphical_column,
-        text="Received Packets vs Flow Duration",
-        command=lambda: show_bwd_pkts_vs_flow_duration(df),
-        bootstyle="outline-primary",  # Unified color with title
+        text="Hexbin: Pacotes vs Duração",
+        command=lambda: show_hexbin_only(df),
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
+
 
     ttk.Button(
         graphical_column,
