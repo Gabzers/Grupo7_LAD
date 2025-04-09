@@ -469,8 +469,8 @@ def analyze_each_graph():
         "  - **NMAP Scans**: These scanning activities have minimal payload sizes, as they primarily involve reconnaissance with minimal data exchange.\n"
         "- **Conclusion**:\n"
         "  - The graph provides valuable insights into the nature of different attack types based on their average packet payload sizes.\n"
-        "  - The distinct patterns observed can aid in the development of targeted detection and mitigation strategies for specific attack types.\n"
-        "5. **Received Packets vs Flow Duration**:\n"
+        "  - The distinct patterns observed can aid in the development of targeted detection and mitigation strategies for specific attack types.\n\n"
+        "5. **Hexbin: Packets vs Duration**:\n"
         "   - Insight: This scatterplot visualizes the relationship between the total number of received packets (`bwd_pkts_tot`) and the duration of network flows (`flow_duration`).\n"
         "   - Analysis: The graph highlights patterns in traffic behavior for different attack types. Clusters of points may indicate specific attack characteristics, such as:\n"
         "     - **Short flows with few packets**: Likely reconnaissance or scanning activities.\n"
@@ -920,14 +920,12 @@ if __name__ == "__main__":
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
-    # Button for HEXBIN
     ttk.Button(
         graphical_column,
         text="Hexbin: Packets vs Duration",
         command=lambda: show_hexbin_only(df),
-        bootstyle="outline-primary",
+        bootstyle="outline-primary", # Unified color with title
     ).pack(pady=10, fill="x")
-
 
     ttk.Button(
         graphical_column,
