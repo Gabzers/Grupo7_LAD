@@ -689,6 +689,23 @@ if __name__ == "__main__":
         bg="lightgray", 
         font=("Arial", 12)
     ).pack(pady=5) 
+        
+    tk.Button(
+        advanced_column, 
+        text="Características do Dataset", 
+        command=show_dataset_characteristics, 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+    tk.Button(
+        advanced_column, 
+        text="Lista de Variáveis e Explicações", 
+        command=show_all_variables, 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
 
     # Run the Tkinter main loop
     root.mainloop()
