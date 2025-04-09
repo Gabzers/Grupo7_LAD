@@ -400,29 +400,10 @@ def show_attack_distribution_pie(df):
     """Displays the distribution of attack types as a pie chart."""
     attack_counts = df["Attack_type"].value_counts()
     plt.figure(figsize=(10, 8))
-    
-    # Adjust pie chart for better readability
-    attack_counts.plot(
-        kind="pie", 
-        autopct="%1.1f%%", 
-        startangle=90, 
-        cmap="tab20", 
-        wedgeprops={'linewidth': 1, 'edgecolor': 'white'},  # Add white edges to wedges
-        textprops={'fontsize': 10}  # Adjust font size for better readability
-    )
-    
-    plt.title("Attack Type Distribution (Pie Chart)", fontsize=14, fontweight="bold")
+    attack_counts.plot(kind="pie", autopct="%1.1f%%", startangle=90, cmap="tab20", legend=True)
+    plt.title("Attack Type Distribution (Pie Chart)")
     plt.ylabel("")  # Remove the default y-axis label
-    
-    # Adjust legend to avoid overlap
-    plt.legend(
-        title="Attack Types", 
-        loc="center left", 
-        bbox_to_anchor=(1, 0.5),  # Place legend outside the chart
-        fontsize=10
-    )
-    
-    plt.tight_layout()  # Adjust layout to prevent overlap
+    plt.tight_layout()
     plt.show()
 
 def analyze_each_graph():
@@ -537,99 +518,6 @@ def calculate_down_up_ratio(df):
     """Calculates the down/up ratio for the dataset."""
     df['down_up_ratio'] = df['bwd_pkts_tot'] / (df['fwd_pkts_tot'] + 1e-9)  # Avoid division by zero
     return df
-
-# Add analysis for flags
-def analyze_flags(df):
-    """Analyzes the distribution of flags in the dataset with bar plots."""
-    flag_columns = ['flow_SYN_flag_count', 'flow_RST_flag_count', 'flow_FIN_flag_count', 
-                    'fwd_PSH_flag_count', 'bwd_PSH_flag_count', 'flow_ACK_flag_count', 
-                    'fwd_URG_flag_count', 'bwd_URG_flag_count', 'flow_CWR_flag_count', 
-                    'flow_ECE_flag_count']
-    flag_labels = {
-        'flow_SYN_flag_count': 'SYN Flag',
-        'flow_RST_flag_count': 'RST Flag',
-        'flow_FIN_flag_count': 'FIN Flag',
-        'fwd_PSH_flag_count': 'FWD PSH Flag',
-        'bwd_PSH_flag_count': 'BWD PSH Flag',
-        'flow_ACK_flag_count': 'ACK Flag',
-        'fwd_URG_flag_count': 'FWD URG Flag',
-        'bwd_URG_flag_count': 'BWD URG Flag',
-        'flow_CWR_flag_count': 'CWR Flag',
-        'flow_ECE_flag_count': 'ECE Flag'
-    }
-    
-    flag_sums = df[flag_columns].sum()
-    plt.figure(figsize=(12, 6))
-    flag_sums.rename(flag_labels).plot(kind="bar", color="teal")
-    plt.title("Distribution of TCP Flags", fontsize=16, fontweight='bold')
-    plt.xlabel("Flags", fontsize=14)
-    plt.ylabel("Count", fontsize=14)
-    plt.xticks(rotation=45, ha="right", fontsize=12)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.tight_layout()
-    plt.show()
-
-
-# Add analysis for IAT
-def analyze_iat(df):
-    """Analyzes the distribution of Inter-Arrival Times (IAT) with clearer labels."""
-    iat_columns = ['fwd_iat.avg', 'fwd_iat.std', 'bwd_iat.avg', 'bwd_iat.std']
-    iat_labels = {
-        'fwd_iat.avg': 'Forward Avg. IAT',
-        'fwd_iat.std': 'Forward IAT Std Dev',
-        'bwd_iat.avg': 'Backward Avg. IAT',
-        'bwd_iat.std': 'Backward IAT Std Dev'
-    }
-    
-    for col in iat_columns:
-        plt.figure(figsize=(10, 6))
-        sns.kdeplot(df[col], shade=True, bw_adjust=0.5, label=iat_labels[col])
-        plt.title(f"Distribution of {iat_labels[col]}", fontsize=16, fontweight='bold')
-        plt.xlabel(iat_labels[col], fontsize=14)
-        plt.ylabel("Density", fontsize=14)
-        if col == 'fwd_iat.avg':  # Apply range adjustment only for fwd_iat.avg
-            plt.xlim(0, 0.25 * 1e8)
-        plt.legend(title="Metric", fontsize=12)
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.tight_layout()
-        plt.show()
-
-
-# Add analysis for activity and idle times
-def analyze_activity_idle(df):
-    """Analyzes the activity and idle times with enhanced visuals."""
-    activity_columns = ['active.avg', 'active.tot', 'idle.avg', 'idle.tot']
-    activity_labels = {
-        'active.avg': 'Average Active Time',
-        'active.tot': 'Total Active Time',
-        'idle.avg': 'Average Idle Time',
-        'idle.tot': 'Total Idle Time'
-    }
-    
-    for col in activity_columns:
-        plt.figure(figsize=(10, 6))
-        sns.kdeplot(df[col], shade=True, bw_adjust=0.5, label=activity_labels[col])
-        plt.title(f"Distribution of {activity_labels[col]}", fontsize=16, fontweight='bold')
-        plt.xlabel(activity_labels[col], fontsize=14)
-        plt.ylabel("Density", fontsize=14)
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend(fontsize=12)
-        plt.tight_layout()
-        plt.show()
-
-
-# Add analysis for down/up ratio
-def analyze_down_up_ratio(df):
-    """Analyzes the distribution of the down/up ratio with a clean histogram."""
-    plt.figure(figsize=(10, 6))
-    sns.histplot(df['down_up_ratio'], kde=True, bins=30, color='purple', label='Down/Up Ratio')
-    plt.title("Distribution of Down/Up Ratio", fontsize=16, fontweight='bold')
-    plt.xlabel("Down/Up Ratio (Packets Received/Sent)", fontsize=14)
-    plt.ylabel("Frequency", fontsize=14)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(fontsize=12)
-    plt.tight_layout()
-    plt.show()
 
 
 def show_dataset_characteristics():
@@ -883,17 +771,6 @@ if __name__ == "__main__":
         foreground=style.colors.get("primary"), # Dark blue background
     ).pack(pady=(5, 15))  # Add padding to separate from buttons
 
-    # Advanced Analysis Section
-    advanced_column = ttk.Labelframe(main_frame, padding=15, bootstyle="primary")
-    advanced_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")
-    ttk.Label(
-        advanced_column,
-        text="Advanced Analysis",  # Add title inside the rectangle
-        font=("Helvetica", 18, "bold"),  # Slightly larger font
-        anchor="center",
-        foreground=style.colors.get("primary"), # Dark blue background
-    ).pack(pady=(5, 15))  # Add padding to separate from buttons
-
     # General Analysis Section
     ttk.Button(
         general_column,
@@ -963,35 +840,6 @@ if __name__ == "__main__":
         graphical_column,
         text="Analyze Each Graph",
         command=lambda: analyze_each_graph(),
-        bootstyle="outline-primary",  # Unified color with title
-    ).pack(pady=10, fill="x")
-
-    # Advanced Analysis Section
-    ttk.Button(
-        advanced_column,
-        text="Analyze Flags",
-        command=lambda: analyze_flags(df),
-        bootstyle="outline-primary",  # Unified color with title
-    ).pack(pady=10, fill="x")
-
-    ttk.Button(
-        advanced_column,
-        text="Analyze IAT",
-        command=lambda: analyze_iat(df),
-        bootstyle="outline-primary",  # Unified color with title
-    ).pack(pady=10, fill="x")
-
-    ttk.Button(
-        advanced_column,
-        text="Analyze Activity and Idle Times",
-        command=lambda: analyze_activity_idle(df),
-        bootstyle="outline-primary",  # Unified color with title
-    ).pack(pady=10, fill="x")
-
-    ttk.Button(
-        advanced_column,
-        text="Analyze Down/Up Ratio",
-        command=lambda: analyze_down_up_ratio(df),
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
