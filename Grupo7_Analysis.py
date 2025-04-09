@@ -270,6 +270,7 @@ def show_packet_size_barplots(df):
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
         plt.show()
+        plt.close()  # Close the plot after displaying it
 
 def show_active_avg_distribution(df):
     plt.figure(figsize=(10, 6))
