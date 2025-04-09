@@ -250,10 +250,11 @@ def show_correlation_heatmap(df):
     plt.show()
 
 def show_protocol_distribution(df):
+    """Displays the distribution of network protocols."""
     plt.figure(figsize=(12, 6))
-    df["proto"].value_counts().head(10).plot(kind="pie", autopct="%1.1%%", cmap="tab10", startangle=90)
+    df["proto"].value_counts().head(10).plot.pie(autopct="%1.1f%%", cmap="tab10", startangle=90)
     plt.title("Distribution of Network Protocols (Top 10)")
-    plt.ylabel("")
+    plt.ylabel("")  # Remove the default y-axis label
     plt.show()
 
 def show_packet_size_barplots(df):
