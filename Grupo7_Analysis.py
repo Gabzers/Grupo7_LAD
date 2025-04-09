@@ -396,9 +396,15 @@ def show_hexbin_only(df):
     plt.tight_layout()
     plt.show()
 
-
-
-
+def show_attack_distribution_pie(df):
+    """Displays the distribution of attack types as a pie chart."""
+    attack_counts = df["Attack_type"].value_counts()
+    plt.figure(figsize=(10, 8))
+    attack_counts.plot(kind="pie", autopct="%1.1f%%", startangle=90, cmap="tab20", legend=True)
+    plt.title("Attack Type Distribution (Pie Chart)")
+    plt.ylabel("")  # Remove the default y-axis label
+    plt.tight_layout()
+    plt.show()
 
 def analyze_each_graph():
     """Provides an analysis of each graph and its insights."""
@@ -901,6 +907,13 @@ if __name__ == "__main__":
 
     ttk.Button(
         graphical_column,
+        text="Attack Distribution (Pie Chart)",
+        command=lambda: show_attack_distribution_pie(df),
+        bootstyle="outline-primary",  # Unified color with title
+    ).pack(pady=10, fill="x")
+
+    ttk.Button(
+        graphical_column,
         text="Correlation Heatmap",
         command=lambda: show_correlation_heatmap(df),
         bootstyle="outline-primary",  # Unified color with title
@@ -927,7 +940,6 @@ if __name__ == "__main__":
         command=lambda: show_hexbin_only(df),
         bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
-
 
     ttk.Button(
         graphical_column,
