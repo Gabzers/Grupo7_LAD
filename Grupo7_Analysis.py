@@ -251,7 +251,7 @@ def show_correlation_heatmap(df):
 
 def show_protocol_distribution(df):
     plt.figure(figsize=(12, 6))
-    df["proto"].value_counts().head(10).plot(kind="pie", autopct="%1.1f%%", cmap="tab10", startangle=90)
+    df["proto"].value_counts().head(10).plot(kind="pie", autopct="%1.1%%", cmap="tab10", startangle=90)
     plt.title("Distribution of Network Protocols (Top 10)")
     plt.ylabel("")
     plt.show()
@@ -278,13 +278,14 @@ def show_active_avg_distribution(df):
     plt.ylabel("Density")
     plt.show()
 
-def show_idle_avg_boxplot(df):
+def show_idle_avg_barplot(df):
+    """Displays a bar plot for the average idle time by protocol."""
     plt.figure(figsize=(12, 6))
-    sns.boxplot(data=df, x="proto", y="idle.avg", palette="Set2")
-    plt.ylim(0, df["idle.avg"].quantile(0.99))
-    plt.title("Distribution of Idle Time by Protocol")
+    idle_avg_by_proto = df.groupby("proto")["idle.avg"].mean().sort_values(ascending=False)
+    idle_avg_by_proto.plot(kind="bar", color="skyblue")
+    plt.title("Average Idle Time by Protocol")
     plt.xlabel("Protocol")
-    plt.ylabel("Idle (Average)")
+    plt.ylabel("Idle Time (Average)")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.show()
@@ -500,8 +501,8 @@ if __name__ == "__main__":
 
     tk.Button(
         graphical_column, 
-        text="Idle Time Boxplot", 
-        command=lambda: show_idle_avg_boxplot(df), 
+        text="Idle Time Barplot", 
+        command=lambda: show_idle_avg_barplot(df), 
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
