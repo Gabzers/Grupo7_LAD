@@ -201,6 +201,15 @@ def show_summary_statistics(df):
     for metric, explanation in explanations.items():
         tk.Label(explanation_frame, text=f"{metric}: {explanation}", font=("Arial", 10)).pack(anchor="w")
 
+    # Add the number of variables to the analysis
+    num_variables = len(df.columns)
+    tk.Label(
+        explanation_frame,
+        text=f"Number of Variables: {num_variables}",
+        font=("Arial", 12, "bold"),
+        fg="blue"
+    ).pack(anchor="w", pady=(10, 0))
+
     # Create a Treeview for the statistics
     tree_frame = tk.Frame(stats_window)
     tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
