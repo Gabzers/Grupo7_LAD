@@ -279,12 +279,12 @@ def show_active_avg_distribution(df):
     plt.show()
 
 def show_idle_avg_barplot(df):
-    """Displays a bar plot for the average idle time by protocol."""
+    """Displays a bar plot for the average idle time by attack type."""
     plt.figure(figsize=(12, 6))
-    idle_avg_by_proto = df.groupby("proto")["idle.avg"].mean().sort_values(ascending=False)
-    idle_avg_by_proto.plot(kind="bar", color="skyblue")
-    plt.title("Average Idle Time by Protocol")
-    plt.xlabel("Protocol")
+    idle_avg_by_attack = df.groupby("Attack_type")["idle.avg"].mean().sort_values(ascending=False)
+    idle_avg_by_attack.plot(kind="bar", color="skyblue")
+    plt.title("Average Idle Time by Attack Type")
+    plt.xlabel("Attack Type")
     plt.ylabel("Idle Time (Average)")
     plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
