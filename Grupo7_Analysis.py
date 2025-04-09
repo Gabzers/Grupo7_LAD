@@ -761,15 +761,6 @@ if __name__ == "__main__":
 
     ttk.Button(
         general_column,
-        text="Flow Duration Distribution",
-        command=lambda: analyze_distribution(
-            df, "flow_duration", "Flow Duration Distribution", "Flow Duration", "Frequency", bins=30, color="blue"
-        ),
-        bootstyle="outline-primary",  # Unified color with title
-    ).pack(pady=10, fill="x")
-
-    ttk.Button(
-        general_column,
         text="Dataset Characteristics",
         command=show_dataset_characteristics,
         bootstyle="outline-primary",  # Unified color with title
