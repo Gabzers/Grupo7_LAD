@@ -373,45 +373,45 @@ def analyze_down_up_ratio(df):
 def show_dataset_characteristics():
     """Displays the characteristics of the dataset in a maximizable window."""
     characteristics = (
-        "🧾 Descrição das Características do Dataset\n\n"
-        "O dataset analisado pertence ao domínio da segurança de redes IoT (Internet of Things), com foco na deteção e análise de ataques cibernéticos. "
-        "Contém registos de tráfego de rede com várias métricas associadas a pacotes e conexões, tanto benignos como maliciosos.\n\n"
-        "📂 Domínio: Segurança em redes IoT\n"
-        f"📊 Tamanho do dataset: Aproximadamente {df.shape[0]} linhas (instâncias) e {df.shape[1]} colunas (atributos).\n"
-        "📄 Tipo de ficheiro: CSV (valores separados por vírgulas)\n\n"
-        "📌 Atributos Importantes:\n"
-        "- proto (Categórica): Protocolo de rede utilizado (ex: TCP, UDP, ICMP).\n"
-        "- flow_duration (Numérica): Duração da sessão de rede.\n"
-        "- fwd_pkts_tot, bwd_pkts_tot (Numéricas): Total de pacotes enviados e recebidos.\n"
-        "- fwd_data_pkts_tot, bwd_data_pkts_tot (Numéricas): Pacotes de dados úteis enviados e recebidos.\n"
-        "- active.min, idle.max (Numéricas): Métricas de tempo entre pacotes e sessões ativas/inativas.\n"
-        "- fwd_init_window_size, bwd_init_window_size (Numéricas): Tamanhos iniciais da janela TCP.\n"
-        "- Attack_type (Categórica): Tipo de ataque identificado (ex: Normal, DDoS, MITM, MQTT_Publish).\n\n"
-        "🌐 Protocolos de Rede:\n"
-        "- TCP (Transmission Control Protocol): Protocolo orientado à conexão, usado para garantir entrega confiável de dados.\n"
-        "- UDP (User Datagram Protocol): Protocolo rápido e sem verificação de erros, usado para vídeos em tempo real, DNS, VoIP.\n"
-        "- ICMP (Internet Control Message Protocol): Utilizado para diagnóstico de rede (ex: comandos ping e traceroute). Frequentemente usado em ataques de reconhecimento.\n"
-        "- MQTT (Message Queuing Telemetry Transport): Protocolo leve, usado frequentemente em IoT para comunicação publish/subscribe. Muito visado por ataques devido à sua simplicidade.\n\n"
-        "🛡️ Tipos de Ataques Presentes:\n"
-        "- Normal: Comunicação legítima.\n"
-        "- DDoS: Envolve múltiplos dispositivos a enviarem tráfego para sobrecarregar o alvo.\n"
-        "- Brute Force: Tentativas repetidas de adivinhar credenciais de login.\n"
-        "- Port Scan: Verifica portas abertas para identificar serviços vulneráveis.\n"
-        "- Botnet: Tráfego gerado por redes de bots controlados remotamente.\n"
-        "- Web Attack: Exploração de vulnerabilidades em aplicações web (ex: SQL Injection).\n"
-        "- MQTT_Publish: Ataques relacionados com o protocolo MQTT.\n"
-        "- MITM (Man-in-the-Middle): Interceptação de comunicações entre dois dispositivos.\n\n"
-        "📦 Pacotes de Rede:\n"
-        "As métricas como fwd_pkts_tot, bwd_data_pkts_tot e flow_duration ajudam a identificar comportamentos anormais, como:\n"
-        "- Envio excessivo de pacotes (comum em ataques DDoS).\n"
-        "- Conexões muito curtas e repetitivas (comum em scanning).\n"
-        "- Pacotes com tamanhos fora do padrão, que podem indicar tentativas de evasão de deteção.\n"
-        "- A duração da sessão e o número de bytes ajudam a distinguir entre tráfego legítimo e malicioso."
+        "🧾 Description of Dataset Characteristics\n\n"
+        "The analyzed dataset belongs to the domain of IoT (Internet of Things) network security, focusing on the detection and analysis of cyberattacks. "
+        "It contains records of network traffic with various metrics associated with packets and connections, both benign and malicious.\n\n"
+        "📂 Domain: IoT Network Security\n"
+        f"📊 Dataset size: Approximately {df.shape[0]} rows (instances) and {df.shape[1]} columns (attributes).\n"
+        "📄 File type: CSV (comma-separated values)\n\n"
+        "📌 Important Attributes:\n"
+        "- proto (Categorical): Network protocol used (e.g., TCP, UDP, ICMP).\n"
+        "- flow_duration (Numeric): Duration of the network session.\n"
+        "- fwd_pkts_tot, bwd_pkts_tot (Numeric): Total packets sent and received.\n"
+        "- fwd_data_pkts_tot, bwd_data_pkts_tot (Numeric): Useful data packets sent and received.\n"
+        "- active.min, idle.max (Numeric): Time metrics between packets and active/inactive sessions.\n"
+        "- fwd_init_window_size, bwd_init_window_size (Numeric): Initial TCP window sizes.\n"
+        "- Attack_type (Categorical): Identified attack type (e.g., Normal, DDoS, MITM, MQTT_Publish).\n\n"
+        "🌐 Network Protocols:\n"
+        "- TCP (Transmission Control Protocol): Connection-oriented protocol used to ensure reliable data delivery.\n"
+        "- UDP (User Datagram Protocol): Fast and error-check-free protocol used for real-time videos, DNS, VoIP.\n"
+        "- ICMP (Internet Control Message Protocol): Used for network diagnostics (e.g., ping and traceroute commands). Often used in reconnaissance attacks.\n"
+        "- MQTT (Message Queuing Telemetry Transport): Lightweight protocol, often used in IoT for publish/subscribe communication. Highly targeted by attacks due to its simplicity.\n\n"
+        "🛡️ Types of Attacks Present:\n"
+        "- Normal: Legitimate communication.\n"
+        "- DDoS: Involves multiple devices sending traffic to overwhelm the target.\n"
+        "- Brute Force: Repeated attempts to guess login credentials.\n"
+        "- Port Scan: Scans open ports to identify vulnerable services.\n"
+        "- Botnet: Traffic generated by remotely controlled bot networks.\n"
+        "- Web Attack: Exploitation of vulnerabilities in web applications (e.g., SQL Injection).\n"
+        "- MQTT_Publish: Attacks related to the MQTT protocol.\n"
+        "- MITM (Man-in-the-Middle): Interception of communications between two devices.\n\n"
+        "📦 Network Packets:\n"
+        "Metrics such as fwd_pkts_tot, bwd_data_pkts_tot, and flow_duration help identify abnormal behaviors, such as:\n"
+        "- Excessive packet sending (common in DDoS attacks).\n"
+        "- Very short and repetitive connections (common in scanning).\n"
+        "- Packets with out-of-standard sizes, which may indicate evasion attempts.\n"
+        "- Session duration and the number of bytes help distinguish between legitimate and malicious traffic."
     )
 
     # Create a new window for displaying the characteristics
     characteristics_window = tk.Toplevel(root)
-    characteristics_window.title("Características do Dataset")
+    characteristics_window.title("Dataset Characteristics")
     characteristics_window.geometry("800x600")
     characteristics_window.resizable(True, True)
 
@@ -421,60 +421,134 @@ def show_dataset_characteristics():
     text_widget.config(state=tk.DISABLED)  # Make the text read-only
     text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-    # Add a scrollbar
-    scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
-    text_widget.config(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
 def show_all_variables():
     """Displays all variables in the dataset with their explanations in a maximizable window."""
     variables_info = (
-        "📋 Lista de Variáveis e Suas Explicações\n\n"
-        "- proto (Categórica): Protocolo de rede utilizado (ex: TCP, UDP, ICMP).\n"
-        "- pkt_size (Numérica): Tamanho médio dos pacotes de rede em bytes.\n"
-        "- tot_pkts (Numérica): Número total de pacotes trocados numa ligação.\n"
-        "- tot_bytes (Numérica): Quantidade total de dados transmitidos (em bytes).\n"
-        "- flow_duration (Numérica): Duração da sessão de rede.\n"
-        "- fwd_pkts_tot (Numérica): Total de pacotes enviados.\n"
-        "- bwd_pkts_tot (Numérica): Total de pacotes recebidos.\n"
-        "- fwd_data_pkts_tot (Numérica): Pacotes de dados úteis enviados.\n"
-        "- bwd_data_pkts_tot (Numérica): Pacotes de dados úteis recebidos.\n"
-        "- fwd_pkts_per_sec (Numérica): Taxa de pacotes enviados por segundo.\n"
-        "- bwd_pkts_per_sec (Numérica): Taxa de pacotes recebidos por segundo.\n"
-        "- payload_bytes_per_second (Numérica): Taxa de transmissão de dados úteis (bytes por segundo).\n"
-        "- active.min (Numérica): Tempo mínimo de atividade entre pacotes.\n"
-        "- active.avg (Numérica): Tempo médio de atividade entre pacotes.\n"
-        "- active.max (Numérica): Tempo máximo de atividade entre pacotes.\n"
-        "- idle.min (Numérica): Tempo mínimo de inatividade entre pacotes.\n"
-        "- idle.avg (Numérica): Tempo médio de inatividade entre pacotes.\n"
-        "- idle.max (Numérica): Tempo máximo de inatividade entre pacotes.\n"
-        "- fwd_init_window_size (Numérica): Tamanho inicial da janela TCP para pacotes enviados.\n"
-        "- bwd_init_window_size (Numérica): Tamanho inicial da janela TCP para pacotes recebidos.\n"
-        "- down_up_ratio (Numérica): Razão entre pacotes recebidos e enviados.\n"
-        "- flow_FIN_flag_count (Numérica): Número de pacotes com a flag FIN ativada.\n"
-        "- flow_SYN_flag_count (Numérica): Número de pacotes com a flag SYN ativada.\n"
-        "- flow_RST_flag_count (Numérica): Número de pacotes com a flag RST ativada.\n"
-        "- flow_ACK_flag_count (Numérica): Número de pacotes com a flag ACK ativada.\n"
-        "- flow_CWR_flag_count (Numérica): Número de pacotes com a flag CWR ativada.\n"
-        "- flow_ECE_flag_count (Numérica): Número de pacotes com a flag ECE ativada.\n"
-        "- fwd_PSH_flag_count (Numérica): Número de pacotes enviados com a flag PSH ativada.\n"
-        "- bwd_PSH_flag_count (Numérica): Número de pacotes recebidos com a flag PSH ativada.\n"
-        "- fwd_URG_flag_count (Numérica): Número de pacotes enviados com a flag URG ativada.\n"
-        "- bwd_URG_flag_count (Numérica): Número de pacotes recebidos com a flag URG ativada.\n"
-        "- fwd_iat.avg (Numérica): Tempo médio entre pacotes enviados consecutivamente.\n"
-        "- fwd_iat.std (Numérica): Desvio padrão do tempo entre pacotes enviados consecutivamente.\n"
-        "- bwd_iat.avg (Numérica): Tempo médio entre pacotes recebidos consecutivamente.\n"
-        "- bwd_iat.std (Numérica): Desvio padrão do tempo entre pacotes recebidos consecutivamente.\n"
-        "- Attack_type (Categórica): Tipo de ataque identificado (ex: Normal, DDoS, MITM, MQTT_Publish).\n"
-        "- label (Categórica): Indica se o tráfego é benigno (Normal) ou malicioso (Attack).\n"
-        "- src_port (Numérica): Porta de origem da conexão.\n"
-        "- dst_port (Numérica): Porta de destino da conexão.\n"
-        "- flags (Categórica): Flags TCP associadas à conexão, que indicam estado/controle do tráfego."
+        "📋 List of Variables and Their Explanations\n\n"
+        "- proto (Categorical): Network protocol used (e.g., TCP, UDP, ICMP).\n"
+        "- pkt_size (Numeric): Average size of network packets in bytes.\n"
+        "- tot_pkts (Numeric): Total number of packets exchanged in a connection.\n"
+        "- tot_bytes (Numeric): Total amount of data transmitted (in bytes).\n"
+        "- flow_duration (Numeric): Duration of the network session.\n"
+        "- fwd_pkts_tot (Numeric): Total packets sent.\n"
+        "- bwd_pkts_tot (Numeric): Total packets received.\n"
+        "- fwd_data_pkts_tot (Numeric): Useful data packets sent.\n"
+        "- bwd_data_pkts_tot (Numeric): Useful data packets received.\n"
+        "- fwd_pkts_per_sec (Numeric): Rate of packets sent per second.\n"
+        "- bwd_pkts_per_sec (Numeric): Rate of packets received per second.\n"
+        "- payload_bytes_per_second (Numeric): Rate of useful data transmission (bytes per second).\n"
+        "- active.min (Numeric): Minimum active time between packets.\n"
+        "- active.avg (Numeric): Average active time between packets.\n"
+        "- active.max (Numeric): Maximum active time between packets.\n"
+        "- idle.min (Numeric): Minimum idle time between packets.\n"
+        "- idle.avg (Numeric): Average idle time between packets.\n"
+        "- idle.max (Numeric): Maximum idle time between packets.\n"
+        "- fwd_init_window_size (Numeric): Initial TCP window size for sent packets.\n"
+        "- bwd_init_window_size (Numeric): Initial TCP window size for received packets.\n"
+        "- down_up_ratio (Numeric): Ratio between received and sent packets.\n"
+        "- flow_FIN_flag_count (Numeric): Number of packets with the FIN flag activated.\n"
+        "- flow_SYN_flag_count (Numeric): Number of packets with the SYN flag activated.\n"
+        "- flow_RST_flag_count (Numeric): Number of packets with the RST flag activated.\n"
+        "- flow_ACK_flag_count (Numeric): Number of packets with the ACK flag activated.\n"
+        "- flow_CWR_flag_count (Numeric): Number of packets with the CWR flag activated.\n"
+        "- flow_ECE_flag_count (Numeric): Number of packets with the ECE flag activated.\n"
+        "- fwd_PSH_flag_count (Numeric): Number of sent packets with the PSH flag activated.\n"
+        "- bwd_PSH_flag_count (Numeric): Number of received packets with the PSH flag activated.\n"
+        "- fwd_URG_flag_count (Numeric): Number of sent packets with the URG flag activated.\n"
+        "- bwd_URG_flag_count (Numeric): Number of received packets with the URG flag activated.\n"
+        "- fwd_iat.avg (Numeric): Average time between consecutively sent packets.\n"
+        "- fwd_iat.std (Numeric): Standard deviation of the time between consecutively sent packets.\n"
+        "- bwd_iat.avg (Numeric): Average time between consecutively received packets.\n"
+        "- bwd_iat.std (Numeric): Standard deviation of the time between consecutively received packets.\n"
+        "- id.orig_p (Numeric): Source port of the connection.\n"
+        "- id.resp_p (Numeric): Destination port of the connection.\n"
+        "- proto (Categorical): Protocol used in the connection (e.g., TCP, UDP).\n"
+        "- service (Categorical): Service associated with the connection (e.g., HTTP, FTP).\n"
+        "- flow_duration (Numeric): Duration of the network flow in microseconds.\n"
+        "- fwd_pkts_tot (Numeric): Total number of packets sent in the forward direction.\n"
+        "- bwd_pkts_tot (Numeric): Total number of packets received in the backward direction.\n"
+        "- fwd_data_pkts_tot (Numeric): Total number of data packets sent in the forward direction.\n"
+        "- bwd_data_pkts_tot (Numeric): Total number of data packets received in the backward direction.\n"
+        "- fwd_pkts_per_sec (Numeric): Rate of packets sent per second in the forward direction.\n"
+        "- bwd_pkts_per_sec (Numeric): Rate of packets received per second in the backward direction.\n"
+        "- flow_pkts_per_sec (Numeric): Total rate of packets per second in the flow.\n"
+        "- down_up_ratio (Numeric): Ratio of received to sent packets.\n"
+        "- fwd_header_size_tot (Numeric): Total size of headers in the forward direction.\n"
+        "- fwd_header_size_min (Numeric): Minimum size of headers in the forward direction.\n"
+        "- fwd_header_size_max (Numeric): Maximum size of headers in the forward direction.\n"
+        "- bwd_header_size_tot (Numeric): Total size of headers in the backward direction.\n"
+        "- bwd_header_size_min (Numeric): Minimum size of headers in the backward direction.\n"
+        "- bwd_header_size_max (Numeric): Maximum size of headers in the backward direction.\n"
+        "- flow_FIN_flag_count (Numeric): Number of packets with the FIN flag activated.\n"
+        "- flow_SYN_flag_count (Numeric): Number of packets with the SYN flag activated.\n"
+        "- flow_RST_flag_count (Numeric): Number of packets with the RST flag activated.\n"
+        "- fwd_PSH_flag_count (Numeric): Number of sent packets with the PSH flag activated.\n"
+        "- bwd_PSH_flag_count (Numeric): Number of received packets with the PSH flag activated.\n"
+        "- flow_ACK_flag_count (Numeric): Number of packets with the ACK flag activated.\n"
+        "- fwd_URG_flag_count (Numeric): Number of sent packets with the URG flag activated.\n"
+        "- bwd_URG_flag_count (Numeric): Number of received packets with the URG flag activated.\n"
+        "- flow_CWR_flag_count (Numeric): Number of packets with the CWR flag activated.\n"
+        "- flow_ECE_flag_count (Numeric): Number of packets with the ECE flag activated.\n"
+        "- fwd_pkts_payload.min (Numeric): Minimum payload size of sent packets.\n"
+        "- fwd_pkts_payload.max (Numeric): Maximum payload size of sent packets.\n"
+        "- fwd_pkts_payload.tot (Numeric): Total payload size of sent packets.\n"
+        "- fwd_pkts_payload.avg (Numeric): Average payload size of sent packets.\n"
+        "- fwd_pkts_payload.std (Numeric): Standard deviation of payload size of sent packets.\n"
+        "- bwd_pkts_payload.min (Numeric): Minimum payload size of received packets.\n"
+        "- bwd_pkts_payload.max (Numeric): Maximum payload size of received packets.\n"
+        "- bwd_pkts_payload.tot (Numeric): Total payload size of received packets.\n"
+        "- bwd_pkts_payload.avg (Numeric): Average payload size of received packets.\n"
+        "- bwd_pkts_payload.std (Numeric): Standard deviation of payload size of received packets.\n"
+        "- flow_pkts_payload.min (Numeric): Minimum payload size of packets in the flow.\n"
+        "- flow_pkts_payload.max (Numeric): Maximum payload size of packets in the flow.\n"
+        "- flow_pkts_payload.tot (Numeric): Total payload size of packets in the flow.\n"
+        "- flow_pkts_payload.avg (Numeric): Average payload size of packets in the flow.\n"
+        "- flow_pkts_payload.std (Numeric): Standard deviation of payload size of packets in the flow.\n"
+        "- fwd_iat.min (Numeric): Minimum inter-arrival time between sent packets.\n"
+        "- fwd_iat.max (Numeric): Maximum inter-arrival time between sent packets.\n"
+        "- fwd_iat.tot (Numeric): Total inter-arrival time between sent packets.\n"
+        "- fwd_iat.avg (Numeric): Average inter-arrival time between sent packets.\n"
+        "- fwd_iat.std (Numeric): Standard deviation of inter-arrival time between sent packets.\n"
+        "- bwd_iat.min (Numeric): Minimum inter-arrival time between received packets.\n"
+        "- bwd_iat.max (Numeric): Maximum inter-arrival time between received packets.\n"
+        "- bwd_iat.tot (Numeric): Total inter-arrival time between received packets.\n"
+        "- bwd_iat.avg (Numeric): Average inter-arrival time between received packets.\n"
+        "- bwd_iat.std (Numeric): Standard deviation of inter-arrival time between received packets.\n"
+        "- flow_iat.min (Numeric): Minimum inter-arrival time between packets in the flow.\n"
+        "- flow_iat.max (Numeric): Maximum inter-arrival time between packets in the flow.\n"
+        "- flow_iat.tot (Numeric): Total inter-arrival time between packets in the flow.\n"
+        "- flow_iat.avg (Numeric): Average inter-arrival time between packets in the flow.\n"
+        "- flow_iat.std (Numeric): Standard deviation of inter-arrival time between packets in the flow.\n"
+        "- payload_bytes_per_second (Numeric): Rate of payload bytes per second in the flow.\n"
+        "- fwd_subflow_pkts (Numeric): Number of subflow packets sent in the forward direction.\n"
+        "- bwd_subflow_pkts (Numeric): Number of subflow packets received in the backward direction.\n"
+        "- fwd_subflow_bytes (Numeric): Number of subflow bytes sent in the forward direction.\n"
+        "- bwd_subflow_bytes (Numeric): Number of subflow bytes received in the backward direction.\n"
+        "- fwd_bulk_bytes (Numeric): Number of bulk bytes sent in the forward direction.\n"
+        "- bwd_bulk_bytes (Numeric): Number of bulk bytes received in the backward direction.\n"
+        "- fwd_bulk_packets (Numeric): Number of bulk packets sent in the forward direction.\n"
+        "- bwd_bulk_packets (Numeric): Number of bulk packets received in the backward direction.\n"
+        "- fwd_bulk_rate (Numeric): Rate of bulk bytes sent in the forward direction.\n"
+        "- bwd_bulk_rate (Numeric): Rate of bulk bytes received in the backward direction.\n"
+        "- active.min (Numeric): Minimum active time of the flow.\n"
+        "- active.max (Numeric): Maximum active time of the flow.\n"
+        "- active.tot (Numeric): Total active time of the flow.\n"
+        "- active.avg (Numeric): Average active time of the flow.\n"
+        "- active.std (Numeric): Standard deviation of active time of the flow.\n"
+        "- idle.min (Numeric): Minimum idle time of the flow.\n"
+        "- idle.max (Numeric): Maximum idle time of the flow.\n"
+        "- idle.tot (Numeric): Total idle time of the flow.\n"
+        "- idle.avg (Numeric): Average idle time of the flow.\n"
+        "- idle.std (Numeric): Standard deviation of idle time of the flow.\n"
+        "- fwd_init_window_size (Numeric): Initial TCP window size for sent packets.\n"
+        "- bwd_init_window_size (Numeric): Initial TCP window size for received packets.\n"
+        "- fwd_last_window_size (Numeric): Last TCP window size for sent packets.\n"
+        "- Attack_type (Categorical): Identified attack type (e.g., Normal, DDoS, MITM, MQTT_Publish).\n"
     )
 
     # Create a new window for displaying the variables
     variables_window = tk.Toplevel(root)
-    variables_window.title("Lista de Variáveis e Explicações")
+    variables_window.title("List of Variables and Explanations")
     variables_window.geometry("800x600")
     variables_window.resizable(True, True)
 
@@ -493,31 +567,29 @@ def show_all_variables():
 if __name__ == "__main__":
     file_path = os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv")
     df = load_csv(file_path)
+
     # Calculate down/up ratio
     df = calculate_down_up_ratio(df)
+
     root = tk.Tk()
     root.title("Statistical Analysis Interface")
     root.geometry("1200x800")  # Initial size
-    root.configure(bg="white")  # Set background color
-
-    # Configure grid weights for responsiveness
-    root.grid_rowconfigure(0, weight=1)
-    root.grid_columnconfigure(0, weight=1)
+    root.configure(bg="#f0f8ff")  # Set a light blue background color
 
     # Title Label
     title_label = tk.Label(
         root, 
-        text="Statistical Analysis Dashboard", 
-        font=("Arial", 24, "bold"), 
-        bg="lightblue", 
-        fg="black", 
-        pady=15
+        text="📊 Statistical Analysis Dashboard", 
+        font=("Arial", 28, "bold"), 
+        bg="#4682b4",  # Steel blue background
+        fg="white",  # White text
+        pady=20
     )
     title_label.pack(fill=tk.X, pady=10)
 
     # Create a frame for the centered layout
-    main_frame = tk.Frame(root, bg="white")
-    main_frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)
+    main_frame = tk.Frame(root, bg="#f0f8ff", padx=20, pady=20)
+    main_frame.pack(expand=True, fill=tk.BOTH)
 
     # Configure grid weights for the main frame
     main_frame.grid_rowconfigure(0, weight=1)
@@ -526,32 +598,32 @@ if __name__ == "__main__":
     main_frame.grid_columnconfigure(2, weight=1)
 
     # Create a grid layout for the three sections
-    general_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    general_column = tk.Frame(main_frame, bg="white", padx=15, pady=15, relief="groove", bd=2)
     general_column.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
 
-    graphical_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    graphical_column = tk.Frame(main_frame, bg="white", padx=15, pady=15, relief="groove", bd=2)
     graphical_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
 
-    advanced_column = tk.Frame(main_frame, bg="white", padx=10, pady=10, relief="solid", bd=1)
+    advanced_column = tk.Frame(main_frame, bg="white", padx=15, pady=15, relief="groove", bd=2)
     advanced_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")
 
     # General Analysis Section
     tk.Label(
         general_column, 
         text="General Analysis", 
-        font=("Arial", 16, "bold"), 
+        font=("Arial", 18, "bold"), 
         bg="white", 
-        fg="black"
-    ).pack(pady=10) 
+        fg="#4682b4"  # Steel blue text
+    ).pack(pady=10)
 
     tk.Button(
         general_column, 
         text="Summary Statistics", 
         command=lambda: show_summary_statistics(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3",  # Light gray background
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         general_column, 
@@ -560,16 +632,16 @@ if __name__ == "__main__":
             df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency', bins=30, color='blue'
         ), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         general_column, 
         text="Dataset Characteristics", 
         command=show_dataset_characteristics, 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
     ).pack(pady=5)
 
@@ -578,7 +650,7 @@ if __name__ == "__main__":
         text="List of Variables and Explanations", 
         command=show_all_variables, 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
     ).pack(pady=5)
 
@@ -586,55 +658,55 @@ if __name__ == "__main__":
     tk.Label(
         graphical_column, 
         text="Graphical Analyses", 
-        font=("Arial", 16, "bold"), 
+        font=("Arial", 18, "bold"), 
         bg="white", 
-        fg="black"
-    ).pack(pady=10) 
+        fg="#4682b4"
+    ).pack(pady=10)
 
     tk.Button(
         graphical_column, 
         text="Attack Type Distribution", 
         command=lambda: show_attack_type_distribution(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         graphical_column, 
         text="Correlation Heatmap", 
         command=lambda: show_correlation_heatmap(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         graphical_column, 
         text="Protocol Distribution", 
         command=lambda: show_protocol_distribution(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         graphical_column, 
         text="Packet Size Bar Plot", 
         command=lambda: show_packet_size_barplots(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         graphical_column, 
         text="Received Packets vs Flow Duration", 
         command=lambda: show_bwd_pkts_vs_flow_duration(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     # Add a new button to explain the importance of the graphs
     def explain_graphs():
@@ -680,7 +752,7 @@ if __name__ == "__main__":
         text="Explain Graphs and Importance", 
         command=explain_graphs, 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
     ).pack(pady=5)
 
@@ -688,46 +760,46 @@ if __name__ == "__main__":
     tk.Label(
         advanced_column, 
         text="Advanced Analyses", 
-        font=("Arial", 16, "bold"), 
+        font=("Arial", 18, "bold"), 
         bg="white", 
-        fg="black"
-    ).pack(pady=10) 
+        fg="#4682b4"
+    ).pack(pady=10)
 
     tk.Button(
         advanced_column, 
         text="Analyze Flags", 
         command=lambda: analyze_flags(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         advanced_column, 
         text="Analyze IAT", 
         command=lambda: analyze_iat(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         advanced_column, 
         text="Analyze Activity and Idle Times", 
         command=lambda: analyze_activity_idle(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
+    ).pack(pady=5)
 
     tk.Button(
         advanced_column, 
         text="Analyze Down/Up Ratio", 
         command=lambda: analyze_down_up_ratio(df), 
         width=30, 
-        bg="lightgray", 
+        bg="#d3d3d3", 
         font=("Arial", 12)
-    ).pack(pady=5) 
-        
+    ).pack(pady=5)
+
     # Run the Tkinter main loop
     root.mainloop()
