@@ -920,10 +920,10 @@ if __name__ == "__main__":
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
-    # Botão para o HEXBIN
+    # Button for HEXBIN
     ttk.Button(
         graphical_column,
-        text="Hexbin: Pacotes vs Duração",
+        text="Hexbin: Packets vs Duration",
         command=lambda: show_hexbin_only(df),
         bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
