@@ -148,8 +148,6 @@ def additional_graphical_analysis(df):
 def perform_statistical_analysis(df):
     numeric_data = df.select_dtypes(include=[np.number])  # Select only numeric columns
     stats = numeric_data.describe().T  # Transpose for better visualization
-    stats['range'] = stats['max'] - stats['min']  # Add range calculation
-    stats['variance'] = numeric_data.var()  # Variance
     stats['mode'] = numeric_data.mode().iloc[0]  # Add mode calculation
     return stats
 
@@ -192,8 +190,6 @@ def show_summary_statistics(df):
         "50%": "Median (50% of data below this value)",
         "75%": "Third quartile (75% of data below this value)",
         "max": "Maximum value",
-        "range": "Range (max - min)",
-        "variance": "Variance (data dispersion)",
         "mode": "Mode (most frequent value)"
     }
 
@@ -909,4 +905,4 @@ if __name__ == "__main__":
 
     # Run the Tkinter main loop
     root.mainloop()
-    
+
