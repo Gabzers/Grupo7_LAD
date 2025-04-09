@@ -410,26 +410,28 @@ def show_attack_distribution_pie(df):
     explode = [0.1 if i == 0 else 0.05 for i in range(len(attack_counts.head(10)))]  # Slightly separate all slices
     plt.figure(figsize=(14, 10))  # Increased figure size for better clarity
 
-    # Create a pie chart with adjustments for better readability
+    # Create a pie chart without percentages and names
     attack_counts.head(10).plot(
         kind="pie",
-        autopct=lambda p: f'{p:.1f}%' if p > 0 else '',  # Format percentages and hide small ones
         startangle=90,
         cmap="tab20",
         explode=explode,
-        pctdistance=0.75,  # Adjust percentage position
-        textprops={'fontsize': 12}  # Adjust font size for better readability
+        labels=None,  # Remove labels from the pie chart
     )
     
     plt.title("Attack Type Distribution (Pie Chart)", fontsize=16, fontweight="bold")
     plt.ylabel("")  # Remove the default y-axis label
     
-    # Add a legend outside the chart
+    # Add a legend outside the chart with percentages
+    legend_labels = [
+        f"{label} ({attack_counts[label] / attack_counts.sum() * 100:.1f}%)"
+        for label in attack_counts.head(10).index
+    ]
     plt.legend(
-        labels=attack_counts.head(10).index,
+        labels=legend_labels,
         title="Attack Types",
         loc="center left",
-        bbox_to_anchor=(1, 0.5),
+        bbox_to_anchor=(1, 0.5),  # Position the legend outside the chart
         fontsize=10
     )
     
