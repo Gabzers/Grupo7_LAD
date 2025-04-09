@@ -256,13 +256,19 @@ def show_protocol_distribution(df):
     plt.ylabel("")
     plt.show()
 
-def show_packet_size_boxplot(df):
-    plt.figure(figsize=(12, 6))
-    sns.boxplot(data=df, x="Attack_type", y="fwd_pkts_payload.tot", palette="coolwarm")
-    plt.ylim(0, df["fwd_pkts_payload.tot"].quantile(0.99))
-    plt.title("Distribution of Packet Sizes Sent by Attack Type")
-    plt.xticks(rotation=90)
-    plt.show()
+def show_packet_size_boxplots(df):
+    """Displays individual boxplots for each variable related to packet sizes."""
+    variables = ['fwd_pkts_payload.tot', 'bwd_pkts_payload.tot', 'fwd_pkts_tot', 'bwd_pkts_tot']
+    for var in variables:
+        plt.figure(figsize=(12, 6))
+        sns.boxplot(data=df, x="Attack_type", y=var, palette="coolwarm")
+        plt.ylim(0, df[var].quantile(0.99))  # Limit to the 99th percentile for better readability
+        plt.title(f"Distribution of {var.replace('_', ' ').title()} by Attack Type")
+        plt.xlabel("Attack Type")
+        plt.ylabel(var.replace('_', ' ').title())
+        plt.xticks(rotation=90)
+        plt.tight_layout()
+        plt.show()
 
 def show_null_values_distribution(df):
     plt.figure(figsize=(12, 6))
@@ -481,7 +487,7 @@ if __name__ == "__main__":
     tk.Button(
         graphical_column, 
         text="Packet Size Boxplot", 
-        command=lambda: show_packet_size_boxplot(df), 
+        command=lambda: show_packet_size_boxplots(df), 
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
