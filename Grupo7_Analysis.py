@@ -693,13 +693,13 @@ if __name__ == "__main__":
     # Initialize ttkbootstrap
     from ttkbootstrap import Window, Style  # Import Window and Style from ttkbootstrap
     root = Window(themename="flatly")  # Use a clean and modern light theme
-    root.title("📊 Statistical Analysis Dashboard")
+    root.title("📊 Advanced IoT Security Analytics")
     root.geometry("1400x900")  # Larger size for better layout
 
     # Title Label
     title_label = ttk.Label(
         root,
-        text="📊 Statistical Analysis Dashboard",
+        text="📊 Advanced IoT Security Analytics",
         font=("Helvetica", 36, "bold italic"),  # Updated font size and style
         anchor="center",
         bootstyle="inverse-primary"  # Dark blue background
