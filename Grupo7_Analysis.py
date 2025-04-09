@@ -743,32 +743,33 @@ if __name__ == "__main__":
 
     # Configure grid weights for the main frame
     main_frame.grid_rowconfigure(0, weight=1)
-    main_frame.grid_columnconfigure(0, weight=1)
-    main_frame.grid_columnconfigure(1, weight=1)
-    main_frame.grid_columnconfigure(2, weight=1)
+    main_frame.grid_columnconfigure(0, weight=1)  # Add weight to the left spacer
+    main_frame.grid_columnconfigure(1, weight=2)  # Add weight to the general analysis column
+    main_frame.grid_columnconfigure(2, weight=2)  # Add weight to the graphical analysis column
+    main_frame.grid_columnconfigure(3, weight=1)  # Add weight to the right spacer
 
     style = Style()
 
     # General Analysis Section
     general_column = ttk.Labelframe(main_frame, padding=15, bootstyle="primary")
-    general_column.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
+    general_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")  # Place in column 1
     ttk.Label(
         general_column,
         text="General Analysis",  # Add title inside the rectangle
         font=("Helvetica", 18, "bold"),  # Slightly larger font
         anchor="center",
-        foreground=style.colors.get("primary"), # Dark blue background
+        foreground=style.colors.get("primary"),  # Dark blue background
     ).pack(pady=(5, 15))  # Add padding to separate from buttons
 
     # Graphical Analysis Section
     graphical_column = ttk.Labelframe(main_frame, padding=15, bootstyle="primary")
-    graphical_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
+    graphical_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")  # Place in column 2
     ttk.Label(
         graphical_column,
         text="Graphical Analysis",  # Add title inside the rectangle
         font=("Helvetica", 18, "bold"),  # Slightly larger font
         anchor="center",
-        foreground=style.colors.get("primary"), # Dark blue background
+        foreground=style.colors.get("primary"),  # Dark blue background
     ).pack(pady=(5, 15))  # Add padding to separate from buttons
 
     # General Analysis Section
