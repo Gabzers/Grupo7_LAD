@@ -234,11 +234,23 @@ def show_distribution(df, column, title, xlabel, ylabel):
 
 # Functions for individual graphical Analysis
 def show_attack_type_distribution(df):
-    plt.figure(figsize=(12, 6))
-    sns.countplot(data=df, y="Attack_type", order=df["Attack_type"].value_counts().index, palette="coolwarm")
-    plt.title("Distribution of Attack Types")
-    plt.xlabel("Number of Occurrences")
-    plt.ylabel("Attack Type")
+    """Displays the distribution of attack types."""
+    plt.figure(figsize=(12, 8))  # Ajustei o tamanho da figura para maior clareza
+    sns.countplot(
+        data=df, 
+        y="Attack_type", 
+        order=df["Attack_type"].value_counts().index, 
+        palette="coolwarm"
+    )
+    
+    # Títulos e rótulos melhorados
+    plt.title("Distribuição dos Tipos de Ataques", fontsize=14, fontweight="bold")
+    plt.xlabel("Número de Ocorrências", fontsize=12)
+    plt.ylabel("Tipo de Ataque", fontsize=12)
+    
+    # Ajuste para evitar sobreposição de elementos
+    plt.tight_layout()
+
     plt.show()
 
 def show_correlation_heatmap(df):
@@ -250,13 +262,26 @@ def show_correlation_heatmap(df):
     plt.title("Correlation Matrix for Selected Features")
     plt.show()
 
+import matplotlib.pyplot as plt
+
 def show_protocol_distribution(df):
     """Displays the distribution of network protocols."""
     plt.figure(figsize=(12, 6))
-    df["proto"].value_counts().head(10).plot.pie(autopct="%1.1f%%", cmap="tab10", startangle=90)
-    plt.title("Distribution of Network Protocols (Top 10)")
-    plt.ylabel("")  # Remove the default y-axis label
+    
+    # Cria um gráfico de pizza com ajustes para maior legibilidade
+    df["proto"].value_counts().head(10).plot.pie(
+        autopct="%1.1f%%", 
+        cmap="tab10", 
+        startangle=90,
+        pctdistance=0.85  # Ajusta a posição do percentual para melhor visibilidade
+    )
+    
+    plt.title("Distribuição dos Protocolos de Rede", fontsize=14, fontweight="bold")
+    plt.ylabel("")  # Remove o rótulo do eixo Y
+    plt.legend(title="Protocolos", loc="center left", bbox_to_anchor=(1, 0.5))  # Adiciona uma legenda clara
+    plt.tight_layout()  # Ajusta o layout para evitar sobreposição
     plt.show()
+
 
 def show_packet_size_barplots(df):
     """Displays individual bar plots for each variable related to packet sizes."""
