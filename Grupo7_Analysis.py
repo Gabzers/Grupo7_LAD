@@ -575,17 +575,18 @@ if __name__ == "__main__":
     df = calculate_down_up_ratio(df)
 
     # Initialize ttkbootstrap
-    from ttkbootstrap import Window  # Import Window from ttkbootstrap
-    root = Window(themename="cosmo")  # Use a modern theme
-    root.title("Statistical Analysis Interface")
-    root.geometry("1200x800")  # Initial size
+    from ttkbootstrap import Window, Style  # Import Window and Style from ttkbootstrap
+    root = Window(themename="superhero")  # Use a modern dark theme
+    root.title("📊 Statistical Analysis Dashboard")
+    root.geometry("1400x900")  # Larger size for better layout
 
     # Title Label
     title_label = ttk.Label(
         root,
         text="📊 Statistical Analysis Dashboard",
-        font=("Helvetica", 28, "bold"),
+        font=("Helvetica", 32, "bold"),
         anchor="center",
+        bootstyle="inverse-primary"
     )
     title_label.pack(fill="x", pady=20)
 
@@ -600,29 +601,22 @@ if __name__ == "__main__":
     main_frame.grid_columnconfigure(2, weight=1)
 
     # Create a grid layout for the three sections
-    general_column = ttk.Frame(main_frame, padding=15, relief="ridge", borderwidth=2)
+    general_column = ttk.Labelframe(main_frame, text="General Analysis", padding=15, bootstyle="primary")
     general_column.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
 
-    graphical_column = ttk.Frame(main_frame, padding=15, relief="ridge", borderwidth=2)
+    graphical_column = ttk.Labelframe(main_frame, text="Graphical Analyses", padding=15, bootstyle="success")
     graphical_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
 
-    advanced_column = ttk.Frame(main_frame, padding=15, relief="ridge", borderwidth=2)
+    advanced_column = ttk.Labelframe(main_frame, text="Advanced Analyses", padding=15, bootstyle="danger")
     advanced_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")
 
     # General Analysis Section
-    ttk.Label(
-        general_column,
-        text="General Analysis",
-        font=("Helvetica", 18, "bold"),
-        anchor="center",
-    ).pack(pady=10)
-
     ttk.Button(
         general_column,
         text="Summary Statistics",
         command=lambda: show_summary_statistics(df),
-        style="primary.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-primary",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         general_column,
@@ -630,154 +624,104 @@ if __name__ == "__main__":
         command=lambda: analyze_distribution(
             df, "flow_duration", "Flow Duration Distribution", "Flow Duration", "Frequency", bins=30, color="blue"
         ),
-        style="primary.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-primary",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         general_column,
         text="Dataset Characteristics",
         command=show_dataset_characteristics,
-        style="primary.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-primary",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         general_column,
         text="List of Variables and Explanations",
         command=show_all_variables,
-        style="primary.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-primary",
+    ).pack(pady=10, fill="x")
 
     # Graphical Analyses Section
-    ttk.Label(
-        graphical_column,
-        text="Graphical Analyses",
-        font=("Helvetica", 18, "bold"),
-        anchor="center",
-    ).pack(pady=10)
-
     ttk.Button(
         graphical_column,
         text="Attack Type Distribution",
         command=lambda: show_attack_type_distribution(df),
-        style="success.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Correlation Heatmap",
         command=lambda: show_correlation_heatmap(df),
-        style="success.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Protocol Distribution",
         command=lambda: show_protocol_distribution(df),
-        style="success.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Packet Size Bar Plot",
         command=lambda: show_packet_size_barplots(df),
-        style="success.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Received Packets vs Flow Duration",
         command=lambda: show_bwd_pkts_vs_flow_duration(df),
-        style="success.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
-    def analyze_each_graph():
-        """Provides an analysis of each graph and its insights."""
-        analysis = (
-            "📊 Analysis of Each Graph and Its Insights\n\n"
-            "1. **Attack Type Distribution**:\n"
-            "   - Insight: This graph shows the frequency of each attack type in the dataset.\n"
-            "   - Analysis: A high frequency of certain attack types (e.g., DDoS) may indicate that the dataset is imbalanced. "
-            "This imbalance can affect the performance of machine learning models and may require techniques like oversampling or undersampling.\n\n"
-            "2. **Correlation Heatmap**:\n"
-            "   - Insight: Displays the relationships between numerical features.\n"
-            "   - Analysis: Strong correlations (e.g., >0.8 or <-0.8) between features can indicate redundancy. "
-            "Highly correlated features can be removed to reduce dimensionality without losing much information.\n\n"
-            "3. **Protocol Distribution**:\n"
-            "   - Insight: Shows the proportion of different network protocols (e.g., TCP, UDP, ICMP).\n"
-            "   - Analysis: Unusual protocol usage (e.g., a high percentage of ICMP traffic) may indicate reconnaissance or scanning activities.\n\n"
-            "4. **Packet Size Bar Plot**:\n"
-            "   - Insight: Displays the average packet sizes for different attack types.\n"
-            "   - Analysis: Certain attack types (e.g., DDoS) may have distinct packet size patterns. "
-            "For example, small packet sizes with high frequency may indicate a volumetric attack.\n\n"
-            "5. **Received Packets vs Flow Duration**:\n"
-            "   - Insight: Visualizes the relationship between the number of received packets and the duration of network flows.\n"
-            "   - Analysis: Anomalies, such as long flows with very few packets, may indicate scanning or reconnaissance activities. "
-            "Conversely, short flows with many packets may indicate bursty traffic patterns, common in certain attacks.\n\n"
-            
-        )
-
-        # Create a new window for displaying the analysis
-        analysis_window = tk.Toplevel(root)
-        analysis_window.title("Analysis of Each Graph")
-        analysis_window.geometry("800x600")
-        analysis_window.resizable(True, True)
-
-        # Add a scrollable text widget
-        text_widget = tk.Text(analysis_window, wrap=tk.WORD, font=("Arial", 12))
-        text_widget.insert(tk.END, analysis)
-        text_widget.config(state=tk.DISABLED)  # Make the text read-only
-        text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        # Add a scrollbar
-        scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
-        text_widget.config(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-    # Add the button to the Graphical Analyses section
-    tk.Button(
-        graphical_column, 
-        text="Analyze Each Graph", 
-        command=analyze_each_graph, 
-        width=30, 
-        bg="#d3d3d3", 
-        font=("Arial", 12)
-    ).pack(pady=5)
+    ttk.Button(
+        graphical_column,
+        text="Analyze Each Graph",
+        command=lambda: analyze_each_graph(),
+        bootstyle="outline-success",
+    ).pack(pady=10, fill="x")
 
     # Advanced Analyses Section
-    ttk.Label(
-        advanced_column,
-        text="Advanced Analyses",
-        font=("Helvetica", 18, "bold"),
-        anchor="center",
-    ).pack(pady=10)
-
     ttk.Button(
         advanced_column,
         text="Analyze Flags",
         command=lambda: analyze_flags(df),
-        style="danger.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-danger",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze IAT",
         command=lambda: analyze_iat(df),
-        style="danger.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-danger",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze Activity and Idle Times",
         command=lambda: analyze_activity_idle(df),
-        style="danger.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-danger",
+    ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze Down/Up Ratio",
         command=lambda: analyze_down_up_ratio(df),
-        style="danger.TButton",
-    ).pack(pady=5, fill="x")
+        bootstyle="outline-danger",
+    ).pack(pady=10, fill="x")
+
+    # Footer
+    footer = ttk.Label(
+        root,
+        text="Developed by Grupo7 | Powered by ttkbootstrap",
+        font=("Helvetica", 10),
+        anchor="center",
+        bootstyle="inverse-light",
+    )
+    footer.pack(fill="x", pady=10)
 
     # Run the Tkinter main loop
     root.mainloop()
