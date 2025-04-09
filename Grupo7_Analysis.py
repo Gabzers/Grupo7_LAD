@@ -400,10 +400,29 @@ def show_attack_distribution_pie(df):
     """Displays the distribution of attack types as a pie chart."""
     attack_counts = df["Attack_type"].value_counts()
     plt.figure(figsize=(10, 8))
-    attack_counts.plot(kind="pie", autopct="%1.1f%%", startangle=90, cmap="tab20", legend=True)
-    plt.title("Attack Type Distribution (Pie Chart)")
+    
+    # Adjust pie chart for better readability
+    attack_counts.plot(
+        kind="pie", 
+        autopct="%1.1f%%", 
+        startangle=90, 
+        cmap="tab20", 
+        wedgeprops={'linewidth': 1, 'edgecolor': 'white'},  # Add white edges to wedges
+        textprops={'fontsize': 10}  # Adjust font size for better readability
+    )
+    
+    plt.title("Attack Type Distribution (Pie Chart)", fontsize=14, fontweight="bold")
     plt.ylabel("")  # Remove the default y-axis label
-    plt.tight_layout()
+    
+    # Adjust legend to avoid overlap
+    plt.legend(
+        title="Attack Types", 
+        loc="center left", 
+        bbox_to_anchor=(1, 0.5),  # Place legend outside the chart
+        fontsize=10
+    )
+    
+    plt.tight_layout()  # Adjust layout to prevent overlap
     plt.show()
 
 def analyze_each_graph():
