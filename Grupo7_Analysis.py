@@ -253,15 +253,18 @@ def show_correlation_heatmap(df):
     """Displays the correlation matrix for selected features."""
     plt.figure(figsize=(12, 10))  # Increased size for better visualization
 
-    selected_features = [
-        "flow_duration", 
-        "fwd_pkts_tot", 
-        "bwd_pkts_tot", 
-        "flow_pkts_per_sec", 
-        "payload_bytes_per_second", 
-        "idle.avg", 
-        "active.avg"
-    ]
+    # Create a dictionary to map the original variable names to more understandable ones
+    feature_names = {
+        "flow_duration": "Flow Duration",
+        "fwd_pkts_tot": "Total Forward Packets",
+        "bwd_pkts_tot": "Total Backward Packets",
+        "flow_pkts_per_sec": "Packets per Second",
+        "payload_bytes_per_second": "Payload Bytes per Second",
+        "idle.avg": "Average Idle Time",
+        "active.avg": "Average Active Time"
+    }
+
+    selected_features = list(feature_names.keys())
     
     # Calculate the correlation matrix
     corr_matrix = df[selected_features].corr()
@@ -276,8 +279,9 @@ def show_correlation_heatmap(df):
         cbar_kws={"label": "Correlation Coefficient"}  # Add label to color bar
     )
     
-    # Rotate X-axis labels
-    plt.xticks(rotation=45)
+    # Rotate X-axis labels with translated names
+    plt.xticks(ticks=range(len(selected_features)), labels=[feature_names[feature] for feature in selected_features], rotation=45)
+    plt.yticks(ticks=range(len(selected_features)), labels=[feature_names[feature] for feature in selected_features])
 
     # Enhanced titles and layout
     plt.title("Correlation Matrix for Selected Features", fontsize=14, fontweight="bold")
@@ -286,6 +290,7 @@ def show_correlation_heatmap(df):
     plt.tight_layout()  # Adjust layout to prevent overlap
     
     plt.show()
+
 
 
 import matplotlib.pyplot as plt
@@ -384,12 +389,13 @@ def show_hexbin_only(df):
         cmap="coolwarm",
         bins='log'
     )
-    plt.colorbar(label='Contagem de Fluxos (log)')
-    plt.title("Densidade entre Pacotes Recebidos e Duração do Fluxo", fontsize=16, fontweight="bold")
-    plt.xlabel("Pacotes Recebidos (Total)", fontsize=14)
-    plt.ylabel("Duração do Fluxo", fontsize=14)
+    plt.colorbar(label='Flow Count (log)')
+    plt.title("Density Between Received Packets and Flow Duration", fontsize=16, fontweight="bold")
+    plt.xlabel("Received Packets (Total)", fontsize=14)
+    plt.ylabel("Flow Duration", fontsize=14)
     plt.tight_layout()
     plt.show()
+
 
 
 
