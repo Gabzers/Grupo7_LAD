@@ -690,6 +690,59 @@ if __name__ == "__main__":
         style="success.TButton",
     ).pack(pady=5, fill="x")
 
+    def analyze_each_graph():
+        """Provides an analysis of each graph and its insights."""
+        analysis = (
+            "📊 Analysis of Each Graph and Its Insights\n\n"
+            "1. **Attack Type Distribution**:\n"
+            "   - Insight: This graph shows the frequency of each attack type in the dataset.\n"
+            "   - Analysis: A high frequency of certain attack types (e.g., DDoS) may indicate that the dataset is imbalanced. "
+            "This imbalance can affect the performance of machine learning models and may require techniques like oversampling or undersampling.\n\n"
+            "2. **Correlation Heatmap**:\n"
+            "   - Insight: Displays the relationships between numerical features.\n"
+            "   - Analysis: Strong correlations (e.g., >0.8 or <-0.8) between features can indicate redundancy. "
+            "Highly correlated features can be removed to reduce dimensionality without losing much information.\n\n"
+            "3. **Protocol Distribution**:\n"
+            "   - Insight: Shows the proportion of different network protocols (e.g., TCP, UDP, ICMP).\n"
+            "   - Analysis: Unusual protocol usage (e.g., a high percentage of ICMP traffic) may indicate reconnaissance or scanning activities.\n\n"
+            "4. **Packet Size Bar Plot**:\n"
+            "   - Insight: Displays the average packet sizes for different attack types.\n"
+            "   - Analysis: Certain attack types (e.g., DDoS) may have distinct packet size patterns. "
+            "For example, small packet sizes with high frequency may indicate a volumetric attack.\n\n"
+            "5. **Received Packets vs Flow Duration**:\n"
+            "   - Insight: Visualizes the relationship between the number of received packets and the duration of network flows.\n"
+            "   - Analysis: Anomalies, such as long flows with very few packets, may indicate scanning or reconnaissance activities. "
+            "Conversely, short flows with many packets may indicate bursty traffic patterns, common in certain attacks.\n\n"
+            
+        )
+
+        # Create a new window for displaying the analysis
+        analysis_window = tk.Toplevel(root)
+        analysis_window.title("Analysis of Each Graph")
+        analysis_window.geometry("800x600")
+        analysis_window.resizable(True, True)
+
+        # Add a scrollable text widget
+        text_widget = tk.Text(analysis_window, wrap=tk.WORD, font=("Arial", 12))
+        text_widget.insert(tk.END, analysis)
+        text_widget.config(state=tk.DISABLED)  # Make the text read-only
+        text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Add a scrollbar
+        scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
+        text_widget.config(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    # Add the button to the Graphical Analyses section
+    tk.Button(
+        graphical_column, 
+        text="Analyze Each Graph", 
+        command=analyze_each_graph, 
+        width=30, 
+        bg="#d3d3d3", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+
     # Advanced Analyses Section
     ttk.Label(
         advanced_column,
