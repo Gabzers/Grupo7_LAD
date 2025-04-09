@@ -78,9 +78,9 @@ def graphical_analysis(df):
     plt.xticks(rotation=90)
     plt.show()
 
-# Additional graphical analyses
+# Additional graphical Analysis
 def additional_graphical_analysis(df):
-    """Performs additional graphical analyses based on the dataset."""
+    """Performs additional graphical Analysis based on the dataset."""
     # 1. Distribution of null values by column (adjusted to avoid visual overload)
     null_counts = df.isnull().sum().sort_values(ascending=False)
     top_nulls = null_counts[null_counts > 0].head(10)  # Show only the top 10 columns with the most null values
@@ -232,7 +232,7 @@ def show_distribution(df, column, title, xlabel, ylabel):
     canvas.draw()
     canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-# Functions for individual graphical analyses
+# Functions for individual graphical Analysis
 def show_attack_type_distribution(df):
     plt.figure(figsize=(12, 6))
     sns.countplot(data=df, y="Attack_type", order=df["Attack_type"].value_counts().index, palette="coolwarm")
@@ -361,7 +361,7 @@ def analyze_each_graph():
         "       - For example, between flow_duration and flow_pkts_per_sec (-0.03), showing that longer flows do not necessarily have a higher packet sending rate.\n"
         "     - Other variables, such as active.avg and idle.avg, have low correlation with others, potentially capturing independent aspects of traffic behavior.\n\n"
         "   - Conclusion:\n"
-        "     - The analysis highlights the need to address high correlation (redundancy) between certain features to avoid issues such as overfitting in predictive models or subsequent statistical analyses.\n\n"
+        "     - The analysis highlights the need to address high correlation (redundancy) between certain features to avoid issues such as overfitting in predictive models or subsequent statistical Analysis.\n\n"
         "3. **Protocol Distribution**:\n"
         "   - Insight: Shows the proportion of different network protocols (e.g., TCP, UDP, ICMP).\n"
         "   - Analysis: Unusual protocol usage (e.g., a high percentage of ICMP traffic) may indicate reconnaissance or scanning activities.\n\n"
@@ -424,7 +424,7 @@ def analyze_each_graph():
     text_widget.config(yscrollcommand=scrollbar.set)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-# Add the button to the Graphical Analyses section
+# Add the button to the Graphical Analysis section
    
 
 # Add down_up_ratio calculation
@@ -782,7 +782,7 @@ if __name__ == "__main__":
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
-    # Graphical Analyses Section
+    # Graphical Analysis Section
     ttk.Button(
         graphical_column,
         text="Attack Type Distribution",
@@ -825,7 +825,7 @@ if __name__ == "__main__":
         bootstyle="outline-primary",  # Unified color with title
     ).pack(pady=10, fill="x")
 
-    # Advanced Analyses Section
+    # Advanced Analysis Section
     ttk.Button(
         advanced_column,
         text="Analyze Flags",
