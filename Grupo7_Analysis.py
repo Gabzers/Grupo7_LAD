@@ -451,18 +451,28 @@ def analyze_flags(df):
 
 # Add analysis for IAT
 def analyze_iat(df):
-    """Analyzes the distribution of Inter-Arrival Times (IAT)."""
+    """Analyzes the distribution of Inter-Arrival Times (IAT) with clearer labels."""
     iat_columns = ['fwd_iat.avg', 'fwd_iat.std', 'bwd_iat.avg', 'bwd_iat.std']
+    iat_labels = {
+        'fwd_iat.avg': 'Forward Avg. IAT',
+        'fwd_iat.std': 'Forward IAT Std Dev',
+        'bwd_iat.avg': 'Backward Avg. IAT',
+        'bwd_iat.std': 'Backward IAT Std Dev'
+    }
+    
     for col in iat_columns:
         plt.figure(figsize=(10, 6))
-        sns.kdeplot(df[col], shade=True, bw_adjust=0.5)
-        plt.title(f"Distribution of {col}")
-        plt.xlabel(col)
-        plt.ylabel("Density")
+        sns.kdeplot(df[col], shade=True, bw_adjust=0.5, label=iat_labels[col])
+        plt.title(f"Distribution of {iat_labels[col]}", fontsize=16, fontweight='bold')
+        plt.xlabel(iat_labels[col], fontsize=14)
+        plt.ylabel("Density", fontsize=14)
         if col == 'fwd_iat.avg':  # Apply range adjustment only for fwd_iat.avg
             plt.xlim(0, 0.25 * 1e8)
+        plt.legend(title="Metric", fontsize=12)
+        plt.grid(True, linestyle='--', alpha=0.6)
         plt.tight_layout()
         plt.show()
+
 
 # Add analysis for activity and idle times
 def analyze_activity_idle(df):
