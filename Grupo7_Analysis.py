@@ -304,11 +304,19 @@ def show_packet_vs_payload_scatter(df):
 
 def show_bwd_pkts_vs_flow_duration(df):
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(data=df, x="bwd_pkts_tot", y="flow_duration", hue="Attack_type", palette="coolwarm", alpha=0.7)
+    sns.scatterplot(
+        data=df,
+        x="bwd_pkts_tot",
+        y="flow_duration",
+        hue="Attack_type",
+        palette="coolwarm",
+        alpha=0.7
+    )
     plt.title("Relationship Between Received Packets and Flow Duration")
     plt.xlabel("Received Packets (Total)")
     plt.ylabel("Flow Duration")
-    plt.legend(title="Attack Type")
+    plt.legend(title="Attack Type", bbox_to_anchor=(1.05, 1), loc="upper left")  # Adjust legend position
+    plt.tight_layout()
     plt.show()
 
 def analyze_each_graph():
@@ -344,6 +352,16 @@ def analyze_each_graph():
         "   - Insight: Displays the relationships between numerical features.\n"
         "   - Analysis: Strong correlations (e.g., >0.8 or <-0.8) between features can indicate redundancy. "
         "Highly correlated features can be removed to reduce dimensionality without losing much information.\n\n"
+        "   - Observations:\n"
+        "     - **Very High Correlation (0.98)**:\n"
+        "       - Between flow_pkts_per_sec and payload_bytes_per_second. This indicates that both measure very similar information about the transmission rate, suggesting redundancy.\n"
+        "     - **Moderate Correlation (0.74)**:\n"
+        "       - Between flow_duration and fwd_pkts_tot, indicating that longer flows tend to have more packets sent.\n"
+        "     - **Weak or Insignificant Correlations**:\n"
+        "       - For example, between flow_duration and flow_pkts_per_sec (-0.03), showing that longer flows do not necessarily have a higher packet sending rate.\n"
+        "     - Other variables, such as active.avg and idle.avg, have low correlation with others, potentially capturing independent aspects of traffic behavior.\n\n"
+        "   - Conclusion:\n"
+        "     - The analysis highlights the need to address high correlation (redundancy) between certain features to avoid issues such as overfitting in predictive models or subsequent statistical analyses.\n\n"
         "3. **Protocol Distribution**:\n"
         "   - Insight: Shows the proportion of different network protocols (e.g., TCP, UDP, ICMP).\n"
         "   - Analysis: Unusual protocol usage (e.g., a high percentage of ICMP traffic) may indicate reconnaissance or scanning activities.\n\n"
@@ -364,9 +382,20 @@ def analyze_each_graph():
         "   - Analysis: Certain attack types (e.g., DDoS) may have distinct packet size patterns. "
         "For example, small packet sizes with high frequency may indicate a volumetric attack.\n\n"
         "5. **Received Packets vs Flow Duration**:\n"
-        "   - Insight: Visualizes the relationship between the number of received packets and the duration of network flows.\n"
-        "   - Analysis: Anomalies, such as long flows with very few packets, may indicate scanning or reconnaissance activities. "
-        "Conversely, short flows with many packets may indicate bursty traffic patterns, common in certain attacks.\n\n"
+        "   - Insight: This scatterplot visualizes the relationship between the total number of received packets (`bwd_pkts_tot`) and the duration of network flows (`flow_duration`).\n"
+        "   - Analysis: The graph highlights patterns in traffic behavior for different attack types. Clusters of points may indicate specific attack characteristics, such as:\n"
+        "     - **Short flows with few packets**: Likely reconnaissance or scanning activities.\n"
+        "     - **Long flows with many packets**: Indicative of sustained attacks, such as DDoS or data exfiltration.\n"
+        "     - **Outliers**: Points with extremely high flow duration or packet counts may represent anomalies or specific attack scenarios.\n\n"
+        "   - Observations:\n"
+        "     - **MQTT_Publish and Thing_Speak**: These attack types dominate the upper-left region, with long flow durations but relatively few packets.\n"
+        "     - **NMAP Scans**: Concentrated in the lower-left region, indicating short flows with minimal packet exchange, typical of scanning activities.\n"
+        "     - **DOS_SYN_Hping**: Scattered across the plot, showing variability in flow duration and packet counts, consistent with its nature as a volumetric attack.\n"
+        "     - **Outliers**: A few points with extremely high flow durations suggest prolonged sessions, possibly due to persistent attacks or misconfigurations.\n\n"
+        "   - Conclusion:\n"
+        "     - The graph reveals distinct traffic patterns for different attack types, aiding in their identification and classification.\n"
+        "     - The presence of outliers and clusters suggests the need for further investigation into specific attack behaviors.\n"
+        "     - This visualization is valuable for understanding traffic dynamics and designing targeted mitigation strategies.\n"
     )
 
     # Create a new window for displaying the analysis
