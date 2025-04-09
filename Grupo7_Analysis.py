@@ -476,16 +476,26 @@ def analyze_iat(df):
 
 # Add analysis for activity and idle times
 def analyze_activity_idle(df):
-    """Analyzes the activity and idle times in the dataset."""
+    """Analyzes the activity and idle times with enhanced visuals."""
     activity_columns = ['active.avg', 'active.tot', 'idle.avg', 'idle.tot']
+    activity_labels = {
+        'active.avg': 'Average Active Time',
+        'active.tot': 'Total Active Time',
+        'idle.avg': 'Average Idle Time',
+        'idle.tot': 'Total Idle Time'
+    }
+    
     for col in activity_columns:
         plt.figure(figsize=(10, 6))
-        sns.kdeplot(df[col], shade=True, bw_adjust=0.5)
-        plt.title(f"Distribution of {col}")
-        plt.xlabel(col)
-        plt.ylabel("Density")
+        sns.kdeplot(df[col], shade=True, bw_adjust=0.5, label=activity_labels[col])
+        plt.title(f"Distribution of {activity_labels[col]}", fontsize=16, fontweight='bold')
+        plt.xlabel(activity_labels[col], fontsize=14)
+        plt.ylabel("Density", fontsize=14)
+        plt.grid(True, linestyle='--', alpha=0.6)
+        plt.legend(fontsize=12)
         plt.tight_layout()
         plt.show()
+
 
 # Add analysis for down/up ratio
 def analyze_down_up_ratio(df):
