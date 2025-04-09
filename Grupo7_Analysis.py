@@ -297,7 +297,7 @@ import matplotlib.pyplot as plt
 
 def show_protocol_distribution(df):
     """Displays the distribution of network protocols."""
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(10, 8))  # Increased figure size for better clarity
     
     # Create a pie chart with adjustments for better readability
     df["proto"].value_counts().head(10).plot.pie(
@@ -308,8 +308,16 @@ def show_protocol_distribution(df):
     )
     
     plt.title("Distribution of Network Protocols", fontsize=14, fontweight="bold")
-    plt.ylabel("")  # Remove the Y-axis label
-    plt.legend(title="Protocols", loc="center left", bbox_to_anchor=(1, 0.5))  # Add a clear legend
+    plt.ylabel("")  # Remove the default y-axis label
+    
+    # Add a legend outside the chart
+    plt.legend(
+        title="Protocols", 
+        loc="center left", 
+        bbox_to_anchor=(1, 0.5),  # Position the legend outside the chart
+        fontsize=10
+    )
+    
     plt.tight_layout()  # Adjust the layout to avoid overlap
     plt.show()
 
@@ -399,11 +407,33 @@ def show_hexbin_only(df):
 def show_attack_distribution_pie(df):
     """Displays the distribution of attack types as a pie chart."""
     attack_counts = df["Attack_type"].value_counts()
-    plt.figure(figsize=(10, 8))
-    attack_counts.plot(kind="pie", autopct="%1.1f%%", startangle=90, cmap="tab20", legend=True)
-    plt.title("Attack Type Distribution (Pie Chart)")
+    explode = [0.1 if i == 0 else 0.05 for i in range(len(attack_counts.head(10)))]  # Slightly separate all slices
+    plt.figure(figsize=(14, 10))  # Increased figure size for better clarity
+
+    # Create a pie chart with adjustments for better readability
+    attack_counts.head(10).plot(
+        kind="pie",
+        autopct=lambda p: f'{p:.1f}%' if p > 0 else '',  # Format percentages and hide small ones
+        startangle=90,
+        cmap="tab20",
+        explode=explode,
+        pctdistance=0.75,  # Adjust percentage position
+        textprops={'fontsize': 12}  # Adjust font size for better readability
+    )
+    
+    plt.title("Attack Type Distribution (Pie Chart)", fontsize=16, fontweight="bold")
     plt.ylabel("")  # Remove the default y-axis label
-    plt.tight_layout()
+    
+    # Add a legend outside the chart
+    plt.legend(
+        labels=attack_counts.head(10).index,
+        title="Attack Types",
+        loc="center left",
+        bbox_to_anchor=(1, 0.5),
+        fontsize=10
+    )
+    
+    plt.tight_layout()  # Adjust the layout to avoid overlap
     plt.show()
 
 def analyze_each_graph():
