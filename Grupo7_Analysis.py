@@ -256,28 +256,19 @@ def show_protocol_distribution(df):
     plt.ylabel("")
     plt.show()
 
-def show_packet_size_boxplots(df):
-    """Displays individual boxplots for each variable related to packet sizes."""
+def show_packet_size_barplots(df):
+    """Displays individual bar plots for each variable related to packet sizes."""
     variables = ['fwd_pkts_payload.tot', 'bwd_pkts_payload.tot', 'fwd_pkts_tot', 'bwd_pkts_tot']
     for var in variables:
         plt.figure(figsize=(12, 6))
-        sns.boxplot(data=df, x="Attack_type", y=var, palette="coolwarm")
-        plt.ylim(0, df[var].quantile(0.99))  # Limit to the 99th percentile for better readability
-        plt.title(f"Distribution of {var.replace('_', ' ').title()} by Attack Type")
+        avg_packet_size = df.groupby("Attack_type")[var].mean().sort_values(ascending=False)
+        avg_packet_size.plot(kind="bar", color="skyblue")
+        plt.title(f"Average {var.replace('_', ' ').title()} by Attack Type")
         plt.xlabel("Attack Type")
         plt.ylabel(var.replace('_', ' ').title())
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
         plt.show()
-
-def show_null_values_distribution(df):
-    plt.figure(figsize=(12, 6))
-    df.isnull().sum().sort_values(ascending=False).plot(kind="bar", color="orange")
-    plt.title("Distribution of Null Values by Column")
-    plt.xlabel("Columns")
-    plt.ylabel("Number of Null Values")
-    plt.xticks(rotation=45)
-    plt.show()
 
 def show_active_avg_distribution(df):
     plt.figure(figsize=(10, 6))
@@ -294,7 +285,8 @@ def show_idle_avg_boxplot(df):
     plt.title("Distribution of Idle Time by Protocol")
     plt.xlabel("Protocol")
     plt.ylabel("Idle (Average)")
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
     plt.show()
 
 def show_packet_vs_payload_scatter(df):
@@ -381,10 +373,8 @@ def analyze_down_up_ratio(df):
 if __name__ == "__main__":
     file_path = os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv")
     df = load_csv(file_path)
-
     # Calculate down/up ratio
     df = calculate_down_up_ratio(df)
-
     root = tk.Tk()
     root.title("Statistical Analysis Interface")
     root.geometry("1200x800")  # Initial size
@@ -432,7 +422,8 @@ if __name__ == "__main__":
         font=("Arial", 16, "bold"), 
         bg="white", 
         fg="black"
-    ).pack(pady=10)
+    ).pack(pady=10) 
+
     tk.Button(
         general_column, 
         text="Summary Statistics", 
@@ -440,7 +431,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         general_column, 
         text="Distribution of Flow Duration", 
@@ -450,7 +442,7 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
 
     # Graphical Analyses Section
     tk.Label(
@@ -459,7 +451,8 @@ if __name__ == "__main__":
         font=("Arial", 16, "bold"), 
         bg="white", 
         fg="black"
-    ).pack(pady=10)
+    ).pack(pady=10) 
+
     tk.Button(
         graphical_column, 
         text="Distribution of Attack Types", 
@@ -467,7 +460,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Correlation Heatmap", 
@@ -475,7 +469,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Protocol Distribution", 
@@ -483,23 +478,17 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
-        text="Packet Size Boxplot", 
-        command=lambda: show_packet_size_boxplots(df), 
+        text="Packet Size Bar Plot", 
+        command=lambda: show_packet_size_barplots(df), 
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
-    tk.Button(
-        graphical_column, 
-        text="Null Values Distribution", 
-        command=lambda: show_null_values_distribution(df), 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Average Active Time Distribution", 
@@ -507,7 +496,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Idle Time Boxplot", 
@@ -515,7 +505,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Packets vs Payload Relationship", 
@@ -523,7 +514,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         graphical_column, 
         text="Received Packets vs Flow Duration", 
@@ -531,7 +523,7 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
 
     # Advanced Analyses Section
     tk.Label(
@@ -540,7 +532,8 @@ if __name__ == "__main__":
         font=("Arial", 16, "bold"), 
         bg="white", 
         fg="black"
-    ).pack(pady=10)
+    ).pack(pady=10) 
+
     tk.Button(
         advanced_column, 
         text="Analyze Flags", 
@@ -548,7 +541,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         advanced_column, 
         text="Analyze IAT", 
@@ -556,7 +550,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         advanced_column, 
         text="Analyze Activity and Idle Times", 
@@ -564,7 +559,8 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
+
     tk.Button(
         advanced_column, 
         text="Analyze Down/Up Ratio", 
@@ -572,7 +568,7 @@ if __name__ == "__main__":
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
-    ).pack(pady=5)
+    ).pack(pady=5) 
 
     # Run the Tkinter main loop
     root.mainloop()
