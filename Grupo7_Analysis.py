@@ -629,39 +629,60 @@ if __name__ == "__main__":
 
     tk.Button(
         graphical_column, 
-        text="Average Active Time Distribution", 
-        command=lambda: show_active_avg_distribution(df), 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5) 
-
-    tk.Button(
-        graphical_column, 
-        text="Idle Time Bar Plot", 
-        command=lambda: show_idle_avg_barplot(df), 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5) 
-
-    tk.Button(
-        graphical_column, 
-        text="Packets vs Payload Relationship", 
-        command=lambda: show_packet_vs_payload_scatter(df), 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5) 
-
-    tk.Button(
-        graphical_column, 
         text="Received Packets vs Flow Duration", 
         command=lambda: show_bwd_pkts_vs_flow_duration(df), 
         width=30, 
         bg="lightgray", 
         font=("Arial", 12)
     ).pack(pady=5) 
+
+    # Add a new button to explain the importance of the graphs
+    def explain_graphs():
+        """Displays explanations for the importance of the graphs."""
+        explanation = (
+            "📊 Importance of Graphical Analyses\n\n"
+            "1. **Attack Type Distribution**:\n"
+            "   - Helps identify the frequency of different attack types in the dataset.\n"
+            "   - Useful for understanding the prevalence of specific attacks and prioritizing mitigation strategies.\n\n"
+            "2. **Correlation Heatmap**:\n"
+            "   - Shows the relationships between numerical features.\n"
+            "   - Helps identify highly correlated features, which can be useful for feature selection in machine learning models.\n\n"
+            "3. **Protocol Distribution**:\n"
+            "   - Displays the usage of different network protocols (e.g., TCP, UDP, ICMP).\n"
+            "   - Useful for identifying unusual protocol usage, which may indicate malicious activity.\n\n"
+            "4. **Packet Size Bar Plot**:\n"
+            "   - Shows the average packet sizes for different attack types.\n"
+            "   - Helps identify patterns in packet sizes that may be indicative of specific attacks.\n\n"
+            "5. **Received Packets vs Flow Duration**:\n"
+            "   - Visualizes the relationship between the number of received packets and the duration of network flows.\n"
+            "   - Useful for identifying anomalies, such as unusually long flows with few packets, which may indicate scanning or reconnaissance activities."
+        )
+
+        # Create a new window for displaying the explanation
+        explanation_window = tk.Toplevel(root)
+        explanation_window.title("Importance of Graphical Analyses")
+        explanation_window.geometry("800x600")
+        explanation_window.resizable(True, True)
+
+        # Add a scrollable text widget
+        text_widget = tk.Text(explanation_window, wrap=tk.WORD, font=("Arial", 12))
+        text_widget.insert(tk.END, explanation)
+        text_widget.config(state=tk.DISABLED)  # Make the text read-only
+        text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Add a scrollbar
+        scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
+        text_widget.config(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+    tk.Button(
+        graphical_column, 
+        text="Explain Graphs and Importance", 
+        command=explain_graphs, 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
 
     # Advanced Analyses Section
     tk.Label(
