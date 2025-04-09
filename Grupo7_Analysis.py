@@ -576,7 +576,7 @@ if __name__ == "__main__":
 
     # Initialize ttkbootstrap
     from ttkbootstrap import Window, Style  # Import Window and Style from ttkbootstrap
-    root = Window(themename="superhero")  # Use a modern dark theme
+    root = Window(themename="flatly")  # Use a clean and modern light theme
     root.title("📊 Statistical Analysis Dashboard")
     root.geometry("1400x900")  # Larger size for better layout
 
@@ -586,7 +586,7 @@ if __name__ == "__main__":
         text="📊 Statistical Analysis Dashboard",
         font=("Helvetica", 32, "bold"),
         anchor="center",
-        bootstyle="inverse-primary"
+        bootstyle="inverse-info"  # Harmonious light blue background
     )
     title_label.pack(fill="x", pady=20)
 
@@ -601,13 +601,13 @@ if __name__ == "__main__":
     main_frame.grid_columnconfigure(2, weight=1)
 
     # Create a grid layout for the three sections
-    general_column = ttk.Labelframe(main_frame, text="General Analysis", padding=15, bootstyle="primary")
+    general_column = ttk.Labelframe(main_frame, text="General Analysis", padding=15, bootstyle="info")
     general_column.grid(row=0, column=0, padx=20, pady=10, sticky="nsew")
 
-    graphical_column = ttk.Labelframe(main_frame, text="Graphical Analyses", padding=15, bootstyle="success")
+    graphical_column = ttk.Labelframe(main_frame, text="Graphical Analyses", padding=15, bootstyle="primary")
     graphical_column.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
 
-    advanced_column = ttk.Labelframe(main_frame, text="Advanced Analyses", padding=15, bootstyle="danger")
+    advanced_column = ttk.Labelframe(main_frame, text="Advanced Analyses", padding=15, bootstyle="success")
     advanced_column.grid(row=0, column=2, padx=20, pady=10, sticky="nsew")
 
     # General Analysis Section
@@ -615,7 +615,7 @@ if __name__ == "__main__":
         general_column,
         text="Summary Statistics",
         command=lambda: show_summary_statistics(df),
-        bootstyle="outline-primary",
+        bootstyle="outline-info",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
@@ -624,21 +624,21 @@ if __name__ == "__main__":
         command=lambda: analyze_distribution(
             df, "flow_duration", "Flow Duration Distribution", "Flow Duration", "Frequency", bins=30, color="blue"
         ),
-        bootstyle="outline-primary",
+        bootstyle="outline-info",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         general_column,
         text="Dataset Characteristics",
         command=show_dataset_characteristics,
-        bootstyle="outline-primary",
+        bootstyle="outline-info",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         general_column,
         text="List of Variables and Explanations",
         command=show_all_variables,
-        bootstyle="outline-primary",
+        bootstyle="outline-info",
     ).pack(pady=10, fill="x")
 
     # Graphical Analyses Section
@@ -646,42 +646,42 @@ if __name__ == "__main__":
         graphical_column,
         text="Attack Type Distribution",
         command=lambda: show_attack_type_distribution(df),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Correlation Heatmap",
         command=lambda: show_correlation_heatmap(df),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Protocol Distribution",
         command=lambda: show_protocol_distribution(df),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Packet Size Bar Plot",
         command=lambda: show_packet_size_barplots(df),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Received Packets vs Flow Duration",
         command=lambda: show_bwd_pkts_vs_flow_duration(df),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         graphical_column,
         text="Analyze Each Graph",
         command=lambda: analyze_each_graph(),
-        bootstyle="outline-success",
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     # Advanced Analyses Section
@@ -689,28 +689,28 @@ if __name__ == "__main__":
         advanced_column,
         text="Analyze Flags",
         command=lambda: analyze_flags(df),
-        bootstyle="outline-danger",
+        bootstyle="outline-success",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze IAT",
         command=lambda: analyze_iat(df),
-        bootstyle="outline-danger",
+        bootstyle="outline-success",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze Activity and Idle Times",
         command=lambda: analyze_activity_idle(df),
-        bootstyle="outline-danger",
+        bootstyle="outline-success",
     ).pack(pady=10, fill="x")
 
     ttk.Button(
         advanced_column,
         text="Analyze Down/Up Ratio",
         command=lambda: analyze_down_up_ratio(df),
-        bootstyle="outline-danger",
+        bootstyle="outline-success",
     ).pack(pady=10, fill="x")
 
     # Footer
