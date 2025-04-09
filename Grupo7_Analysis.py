@@ -555,7 +555,7 @@ if __name__ == "__main__":
 
     tk.Button(
         general_column, 
-        text="Distribution of Flow Duration", 
+        text="Flow Duration Distribution", 
         command=lambda: analyze_distribution(
             df, 'flow_duration', 'Flow Duration Distribution', 'Flow Duration', 'Frequency', bins=30, color='blue'
         ), 
@@ -563,6 +563,24 @@ if __name__ == "__main__":
         bg="lightgray", 
         font=("Arial", 12)
     ).pack(pady=5) 
+
+    tk.Button(
+        general_column, 
+        text="Dataset Characteristics", 
+        command=show_dataset_characteristics, 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
+
+    tk.Button(
+        general_column, 
+        text="List of Variables and Explanations", 
+        command=show_all_variables, 
+        width=30, 
+        bg="lightgray", 
+        font=("Arial", 12)
+    ).pack(pady=5)
 
     # Graphical Analyses Section
     tk.Label(
@@ -575,7 +593,7 @@ if __name__ == "__main__":
 
     tk.Button(
         graphical_column, 
-        text="Distribution of Attack Types", 
+        text="Attack Type Distribution", 
         command=lambda: show_attack_type_distribution(df), 
         width=30, 
         bg="lightgray", 
@@ -620,7 +638,7 @@ if __name__ == "__main__":
 
     tk.Button(
         graphical_column, 
-        text="Idle Time Barplot", 
+        text="Idle Time Bar Plot", 
         command=lambda: show_idle_avg_barplot(df), 
         width=30, 
         bg="lightgray", 
@@ -690,22 +708,5 @@ if __name__ == "__main__":
         font=("Arial", 12)
     ).pack(pady=5) 
         
-    tk.Button(
-        advanced_column, 
-        text="Características do Dataset", 
-        command=show_dataset_characteristics, 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5)
-    tk.Button(
-        advanced_column, 
-        text="Lista de Variáveis e Explicações", 
-        command=show_all_variables, 
-        width=30, 
-        bg="lightgray", 
-        font=("Arial", 12)
-    ).pack(pady=5)
-
     # Run the Tkinter main loop
     root.mainloop()
