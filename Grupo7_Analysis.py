@@ -370,6 +370,125 @@ def analyze_down_up_ratio(df):
     plt.tight_layout()
     plt.show()
 
+def show_dataset_characteristics():
+    """Displays the characteristics of the dataset in a maximizable window."""
+    characteristics = (
+        "🧾 Descrição das Características do Dataset\n\n"
+        "O dataset analisado pertence ao domínio da segurança de redes IoT (Internet of Things), com foco na deteção e análise de ataques cibernéticos. "
+        "Contém registos de tráfego de rede com várias métricas associadas a pacotes e conexões, tanto benignos como maliciosos.\n\n"
+        "📂 Domínio: Segurança em redes IoT\n"
+        f"📊 Tamanho do dataset: Aproximadamente {df.shape[0]} linhas (instâncias) e {df.shape[1]} colunas (atributos).\n"
+        "📄 Tipo de ficheiro: CSV (valores separados por vírgulas)\n\n"
+        "📌 Atributos Importantes:\n"
+        "- proto (Categórica): Protocolo de rede utilizado (ex: TCP, UDP, ICMP).\n"
+        "- flow_duration (Numérica): Duração da sessão de rede.\n"
+        "- fwd_pkts_tot, bwd_pkts_tot (Numéricas): Total de pacotes enviados e recebidos.\n"
+        "- fwd_data_pkts_tot, bwd_data_pkts_tot (Numéricas): Pacotes de dados úteis enviados e recebidos.\n"
+        "- active.min, idle.max (Numéricas): Métricas de tempo entre pacotes e sessões ativas/inativas.\n"
+        "- fwd_init_window_size, bwd_init_window_size (Numéricas): Tamanhos iniciais da janela TCP.\n"
+        "- Attack_type (Categórica): Tipo de ataque identificado (ex: Normal, DDoS, MITM, MQTT_Publish).\n\n"
+        "🌐 Protocolos de Rede:\n"
+        "- TCP (Transmission Control Protocol): Protocolo orientado à conexão, usado para garantir entrega confiável de dados.\n"
+        "- UDP (User Datagram Protocol): Protocolo rápido e sem verificação de erros, usado para vídeos em tempo real, DNS, VoIP.\n"
+        "- ICMP (Internet Control Message Protocol): Utilizado para diagnóstico de rede (ex: comandos ping e traceroute). Frequentemente usado em ataques de reconhecimento.\n"
+        "- MQTT (Message Queuing Telemetry Transport): Protocolo leve, usado frequentemente em IoT para comunicação publish/subscribe. Muito visado por ataques devido à sua simplicidade.\n\n"
+        "🛡️ Tipos de Ataques Presentes:\n"
+        "- Normal: Comunicação legítima.\n"
+        "- DDoS: Envolve múltiplos dispositivos a enviarem tráfego para sobrecarregar o alvo.\n"
+        "- Brute Force: Tentativas repetidas de adivinhar credenciais de login.\n"
+        "- Port Scan: Verifica portas abertas para identificar serviços vulneráveis.\n"
+        "- Botnet: Tráfego gerado por redes de bots controlados remotamente.\n"
+        "- Web Attack: Exploração de vulnerabilidades em aplicações web (ex: SQL Injection).\n"
+        "- MQTT_Publish: Ataques relacionados com o protocolo MQTT.\n"
+        "- MITM (Man-in-the-Middle): Interceptação de comunicações entre dois dispositivos.\n\n"
+        "📦 Pacotes de Rede:\n"
+        "As métricas como fwd_pkts_tot, bwd_data_pkts_tot e flow_duration ajudam a identificar comportamentos anormais, como:\n"
+        "- Envio excessivo de pacotes (comum em ataques DDoS).\n"
+        "- Conexões muito curtas e repetitivas (comum em scanning).\n"
+        "- Pacotes com tamanhos fora do padrão, que podem indicar tentativas de evasão de deteção.\n"
+        "- A duração da sessão e o número de bytes ajudam a distinguir entre tráfego legítimo e malicioso."
+    )
+
+    # Create a new window for displaying the characteristics
+    characteristics_window = tk.Toplevel(root)
+    characteristics_window.title("Características do Dataset")
+    characteristics_window.geometry("800x600")
+    characteristics_window.resizable(True, True)
+
+    # Add a scrollable text widget
+    text_widget = tk.Text(characteristics_window, wrap=tk.WORD, font=("Arial", 12))
+    text_widget.insert(tk.END, characteristics)
+    text_widget.config(state=tk.DISABLED)  # Make the text read-only
+    text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    # Add a scrollbar
+    scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
+    text_widget.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+def show_all_variables():
+    """Displays all variables in the dataset with their explanations in a maximizable window."""
+    variables_info = (
+        "📋 Lista de Variáveis e Suas Explicações\n\n"
+        "- proto (Categórica): Protocolo de rede utilizado (ex: TCP, UDP, ICMP).\n"
+        "- pkt_size (Numérica): Tamanho médio dos pacotes de rede em bytes.\n"
+        "- tot_pkts (Numérica): Número total de pacotes trocados numa ligação.\n"
+        "- tot_bytes (Numérica): Quantidade total de dados transmitidos (em bytes).\n"
+        "- flow_duration (Numérica): Duração da sessão de rede.\n"
+        "- fwd_pkts_tot (Numérica): Total de pacotes enviados.\n"
+        "- bwd_pkts_tot (Numérica): Total de pacotes recebidos.\n"
+        "- fwd_data_pkts_tot (Numérica): Pacotes de dados úteis enviados.\n"
+        "- bwd_data_pkts_tot (Numérica): Pacotes de dados úteis recebidos.\n"
+        "- fwd_pkts_per_sec (Numérica): Taxa de pacotes enviados por segundo.\n"
+        "- bwd_pkts_per_sec (Numérica): Taxa de pacotes recebidos por segundo.\n"
+        "- payload_bytes_per_second (Numérica): Taxa de transmissão de dados úteis (bytes por segundo).\n"
+        "- active.min (Numérica): Tempo mínimo de atividade entre pacotes.\n"
+        "- active.avg (Numérica): Tempo médio de atividade entre pacotes.\n"
+        "- active.max (Numérica): Tempo máximo de atividade entre pacotes.\n"
+        "- idle.min (Numérica): Tempo mínimo de inatividade entre pacotes.\n"
+        "- idle.avg (Numérica): Tempo médio de inatividade entre pacotes.\n"
+        "- idle.max (Numérica): Tempo máximo de inatividade entre pacotes.\n"
+        "- fwd_init_window_size (Numérica): Tamanho inicial da janela TCP para pacotes enviados.\n"
+        "- bwd_init_window_size (Numérica): Tamanho inicial da janela TCP para pacotes recebidos.\n"
+        "- down_up_ratio (Numérica): Razão entre pacotes recebidos e enviados.\n"
+        "- flow_FIN_flag_count (Numérica): Número de pacotes com a flag FIN ativada.\n"
+        "- flow_SYN_flag_count (Numérica): Número de pacotes com a flag SYN ativada.\n"
+        "- flow_RST_flag_count (Numérica): Número de pacotes com a flag RST ativada.\n"
+        "- flow_ACK_flag_count (Numérica): Número de pacotes com a flag ACK ativada.\n"
+        "- flow_CWR_flag_count (Numérica): Número de pacotes com a flag CWR ativada.\n"
+        "- flow_ECE_flag_count (Numérica): Número de pacotes com a flag ECE ativada.\n"
+        "- fwd_PSH_flag_count (Numérica): Número de pacotes enviados com a flag PSH ativada.\n"
+        "- bwd_PSH_flag_count (Numérica): Número de pacotes recebidos com a flag PSH ativada.\n"
+        "- fwd_URG_flag_count (Numérica): Número de pacotes enviados com a flag URG ativada.\n"
+        "- bwd_URG_flag_count (Numérica): Número de pacotes recebidos com a flag URG ativada.\n"
+        "- fwd_iat.avg (Numérica): Tempo médio entre pacotes enviados consecutivamente.\n"
+        "- fwd_iat.std (Numérica): Desvio padrão do tempo entre pacotes enviados consecutivamente.\n"
+        "- bwd_iat.avg (Numérica): Tempo médio entre pacotes recebidos consecutivamente.\n"
+        "- bwd_iat.std (Numérica): Desvio padrão do tempo entre pacotes recebidos consecutivamente.\n"
+        "- Attack_type (Categórica): Tipo de ataque identificado (ex: Normal, DDoS, MITM, MQTT_Publish).\n"
+        "- label (Categórica): Indica se o tráfego é benigno (Normal) ou malicioso (Attack).\n"
+        "- src_port (Numérica): Porta de origem da conexão.\n"
+        "- dst_port (Numérica): Porta de destino da conexão.\n"
+        "- flags (Categórica): Flags TCP associadas à conexão, que indicam estado/controle do tráfego."
+    )
+
+    # Create a new window for displaying the variables
+    variables_window = tk.Toplevel(root)
+    variables_window.title("Lista de Variáveis e Explicações")
+    variables_window.geometry("800x600")
+    variables_window.resizable(True, True)
+
+    # Add a scrollable text widget
+    text_widget = tk.Text(variables_window, wrap=tk.WORD, font=("Arial", 12))
+    text_widget.insert(tk.END, variables_info)
+    text_widget.config(state=tk.DISABLED)  # Make the text read-only
+    text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    # Add a scrollbar
+    scrollbar = tk.Scrollbar(text_widget, command=text_widget.yview)
+    text_widget.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
 # Main Tkinter window
 if __name__ == "__main__":
     file_path = os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv")
