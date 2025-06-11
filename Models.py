@@ -1,21 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
-from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.decomposition import PCA
-from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.cluster import KMeans, AgglomerativeClustering
-from scipy.cluster.hierarchy import dendrogram, linkage
-import seaborn as sns
 import matplotlib.pyplot as plt
-import time
 
 # 1. Carregamento do dataset
 df = pd.read_csv("RT_IOT2022.csv")
@@ -47,220 +33,23 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# 8. Inicializar modelos
-models = {
-    "Linear Regression": LinearRegression(),  # Para regressão, apenas para demonstração
-    "Logistic Regression": LogisticRegression(max_iter=1000),
-    "Ridge Regression (alpha=1.0)": Ridge(alpha=1.0),
-    "Lasso Regression (alpha=0.1)": Lasso(alpha=0.1),
-    "Naive Bayes": GaussianNB(),
-    "SVM (linear kernel)": SVC(kernel='linear'),
-    "SVM (rbf kernel)": SVC(kernel='rbf'),
-    "KNN (k=5)": KNeighborsClassifier(n_neighbors=5),
-    "Decision Tree": DecisionTreeClassifier(random_state=42),
-    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
-    "Neural Net (1 layer)": MLPClassifier(hidden_layer_sizes=(50,), max_iter=500, random_state=42),
-    "Neural Net (multi layer)": MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
-}
+# Importar as classes de análise
+from LogisticRegressionAnalysis import LogisticRegressionAnalysis
+from RandomForestAnalysis import RandomForestAnalysis
+from SVMAnalysis import SVMAnalysis
+# ...importe outras análises conforme necessário...
 
-# 9. Treinar e avaliar
-for name, model in models.items():
-    print(f"\n🔍 Modelo: {name}")
-    # Linear, Ridge, Lasso são modelos de regressão, tratá-los separadamente
-    if name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name:
-        model.fit(X_train_scaled, y_train)
-        y_pred = model.predict(X_test_scaled)
-        # Para regressão, converter para classificação (apenas para comparação)
-        y_pred_class = y_pred.round().astype(int)
-        print(classification_report(
-            y_test, y_pred_class, 
-            labels=range(len(le.classes_)), 
-            target_names=le.classes_
-        ))
-    else:
-        model.fit(X_train_scaled, y_train)
-        y_pred = model.predict(X_test_scaled)
-        print(classification_report(
-            y_test, y_pred, 
-            labels=range(len(le.classes_)), 
-            target_names=le.classes_
-        ))
-    
-    # Matriz de Confusão (exceto para regressão)
-    if not (name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name):
-        cm = confusion_matrix(y_test, y_pred, labels=range(len(le.classes_)))
-        plt.figure(figsize=(10, 7))
-        sns.heatmap(cm, annot=False, fmt='d', cmap="Blues")
-        plt.title(f"Matriz de Confusão: {name}")
-        plt.xlabel("Predito")
-        plt.ylabel("Verdadeiro")
-        plt.show()
-    
-    # Decision Tree: desenhar árvore e analisar gini
-    if name == "Decision Tree":
-        plt.figure(figsize=(20, 10))
-        plot_tree(model, feature_names=X.columns, class_names=le.classes_, filled=True, max_depth=2)
-        plt.title("Árvore de Decisão (max_depth=2)")
-        plt.show()
-        print("Gini feature importances:", model.feature_importances_)
-    
-    # Random Forest: mostrar uma árvore
-    if name == "Random Forest":
-        plt.figure(figsize=(20, 10))
-        plot_tree(model.estimators_[0], feature_names=X.columns, class_names=le.classes_, filled=True, max_depth=2)
-        plt.title("Uma árvore do Random Forest (max_depth=2)")
-        plt.show()
+if __name__ == "__main__":
+    lr_analysis = LogisticRegressionAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, X.columns)
+    lr_analysis.run()
 
-# Ridge/Lasso alpha analysis
-alphas = [0.01, 0.1, 1, 10]
-ridge_scores = []
-lasso_scores = []
-for alpha in alphas:
-    ridge = Ridge(alpha=alpha)
-    lasso = Lasso(alpha=alpha)
-    ridge.fit(X_train_scaled, y_train)
-    lasso.fit(X_train_scaled, y_train)
-    ridge_scores.append(ridge.score(X_test_scaled, y_test))
-    lasso_scores.append(lasso.score(X_test_scaled, y_test))
-plt.figure()
-plt.plot(alphas, ridge_scores, label="Ridge")
-plt.plot(alphas, lasso_scores, label="Lasso")
-plt.xscale('log')
-plt.xlabel("Alpha")
-plt.ylabel("Score")
-plt.title("Ridge/Lasso Alpha Analysis")
-plt.legend()
-plt.show()
+    rf_analysis = RandomForestAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, X.columns)
+    rf_analysis.run()
 
-# KNN: análise do número ótimo de vizinhos
-knn_scores = []
-neighbors_range = range(1, 21)
-for k in neighbors_range:
-    knn = KNeighborsClassifier(n_neighbors=k)
-    knn.fit(X_train_scaled, y_train)
-    knn_scores.append(knn.score(X_test_scaled, y_test))
-plt.figure()
-plt.plot(neighbors_range, knn_scores, marker='o')
-plt.xlabel("Número de vizinhos (k)")
-plt.ylabel("Acurácia")
-plt.title("Análise do número ótimo de vizinhos para KNN")
-plt.show()
+    svm_linear_analysis = SVMAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, kernel='linear')
+    svm_linear_analysis.run()
 
-# --- Análise do tempo de ajuste (fit time) por modelo ---
-fit_times = {}
-for name, model in models.items():
-    start = time.time()
-    if name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name:
-        model.fit(X_train_scaled, y_train)
-    else:
-        model.fit(X_train_scaled, y_train)
-    fit_times[name] = time.time() - start
-plt.figure()
-plt.barh(list(fit_times.keys()), list(fit_times.values()))
-plt.xlabel("Tempo de ajuste (s)")
-plt.title("Tempo de ajuste por modelo")
-plt.show()
+    svm_rbf_analysis = SVMAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, kernel='rbf')
+    svm_rbf_analysis.run()
 
-# --- PCA (SVD) e comparação de acurácia e tempo ---
-pca = PCA(n_components=0.95, svd_solver='full')
-X_train_pca = pca.fit_transform(X_train_scaled)
-X_test_pca = pca.transform(X_test_scaled)
-print(f"Redução de {X_train_scaled.shape[1]} para {X_train_pca.shape[1]} componentes principais.")
-
-fit_times_pca = {}
-scores_pca = {}
-for name, model in models.items():
-    start = time.time()
-    if name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name:
-        model.fit(X_train_pca, y_train)
-        y_pred = model.predict(X_test_pca).round().astype(int)
-    else:
-        model.fit(X_train_pca, y_train)
-        y_pred = model.predict(X_test_pca)
-    fit_times_pca[name] = time.time() - start
-    scores_pca[name] = model.score(X_test_pca, y_test)
-plt.figure()
-plt.barh(list(fit_times_pca.keys()), list(fit_times_pca.values()))
-plt.xlabel("Tempo de ajuste (s) com PCA")
-plt.title("Tempo de ajuste por modelo (PCA)")
-plt.show()
-plt.figure()
-plt.barh(list(scores_pca.keys()), list(scores_pca.values()))
-plt.xlabel("Acurácia com PCA")
-plt.title("Acurácia dos modelos após PCA")
-plt.show()
-
-# --- Clustering: KMeans e Hierarchical ---
-# Usar apenas features (sem target)
-X_cluster = X_train_scaled
-
-# KMeans: análise do número ótimo de clusters (Elbow method)
-inertia = []
-K = range(2, 11)
-for k in K:
-    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    kmeans.fit(X_cluster)
-    inertia.append(kmeans.inertia_)
-plt.figure()
-plt.plot(K, inertia, marker='o')
-plt.xlabel("Número de clusters")
-plt.ylabel("Inércia")
-plt.title("Método do cotovelo para KMeans")
-plt.show()
-
-# Hierarchical clustering: dendrograma
-linked = linkage(X_cluster[:200], method='ward')  # Usar amostra para performance
-plt.figure(figsize=(10, 7))
-dendrogram(linked)
-plt.title("Dendrograma (Hierarchical Clustering)")
-plt.xlabel("Amostras")
-plt.ylabel("Distância")
-plt.show()
-
-# --- Cross Validation ---
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-best_model = LogisticRegression(max_iter=1000)
-cv_scores = cross_val_score(best_model, X_train_scaled, y_train, cv=cv, scoring='accuracy')
-print("Acurácias na validação cruzada:", cv_scores)
-print("Média:", cv_scores.mean())
-
-# --- Análise de métricas (Precision, Recall, F1) com gráficos ---
-from sklearn.metrics import precision_recall_fscore_support
-
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train_scaled, y_train)
-y_pred = model.predict(X_test_scaled)
-precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred, labels=range(len(le.classes_)))
-plt.figure(figsize=(10,5))
-plt.bar(le.classes_, precision, alpha=0.7, label='Precision')
-plt.bar(le.classes_, recall, alpha=0.7, label='Recall')
-plt.bar(le.classes_, f1, alpha=0.7, label='F1-score')
-plt.ylabel("Score")
-plt.title("Precision, Recall e F1-score por classe (Random Forest)")
-plt.legend()
-plt.show()
-
-# --- Dashboard: aplicação preditiva/classificadora (exemplo simples) ---
-def predict_attack_type(input_data):
-    input_scaled = scaler.transform([input_data])
-    pred = model.predict(input_scaled)
-    return le.inverse_transform(pred)[0]
-
-# O classification report mostra várias métricas importantes para avaliar o desempenho do modelo:
-# - precision: Proporção de predições positivas corretas para cada classe.
-# - recall: Proporção de exemplos positivos corretamente identificados para cada classe.
-# - f1-score: Média harmônica entre precision e recall (quanto mais próximo de 1, melhor).
-# - support: Número de exemplos reais de cada classe no conjunto de teste.
-
-# Para saber se o modelo é bom:
-# - Olhe para os valores de precision, recall e f1-score (quanto mais próximos de 1, melhor).
-# - Veja a acurácia geral (accuracy).
-# - Compare macro avg (média simples entre classes) e weighted avg (média ponderada pelo número de exemplos).
-
-# No seu caso, os valores estão muito próximos de 1, indicando que o modelo está com desempenho excelente.
-# Se os valores fossem baixos (ex: <0.7), o modelo não seria considerado bom.
-
-# Ridge Regression (alpha=1.0) não é muito bom para este problema.
-# Isso porque Ridge é um modelo de regressão, não de classificação.
-# Os resultados mostram f1-score baixo para várias classes e macro avg baixo (~0.32).
-# Modelos de classificação (Logistic Regression, Random Forest, SVM, etc.) são mais adequados para este tipo de tarefa.
+    # ...execute outras análises conforme necessário...
