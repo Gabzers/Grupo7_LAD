@@ -7,9 +7,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 
 class RandomForestAnalysis:
-    def __init__(self, X_train, X_test, y_train, y_test, le, feature_names=None, use_pca=True, n_components=10):
+    def __init__(self, X_train, X_test, y_train, y_test, le, feature_names=None, use_pca=True, n_components=10, use_clustering=True, n_clusters=5):
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.X_train = X_train
         self.X_test = X_test
@@ -20,7 +21,23 @@ class RandomForestAnalysis:
         self.use_pca = use_pca
         self.n_components = n_components
         self.pca = None
+        self.use_clustering = use_clustering
+        self.n_clusters = n_clusters
         
+    def apply_clustering(self):
+        """Aplica KMeans para análise exploratória e adiciona cluster_id como feature."""
+        if self.use_clustering:
+            print(f"\nAplicando KMeans Clustering com {self.n_clusters} clusters para análise exploratória e feature engineering...")
+            kmeans = KMeans(n_clusters=self.n_clusters, random_state=42)
+            # Ajusta nos dados de treino e prediz para ambos
+            cluster_train = kmeans.fit_predict(self.X_train)
+            cluster_test = kmeans.predict(self.X_test)
+            # Adiciona cluster_id como nova feature
+            import numpy as np
+            self.X_train = np.column_stack([self.X_train, cluster_train])
+            self.X_test = np.column_stack([self.X_test, cluster_test])
+            print("Cluster_id adicionado como nova feature para Random Forest.")
+
     def apply_pca(self):
         """Aplica PCA aos dados de treino e teste."""
         if self.use_pca:
@@ -41,7 +58,9 @@ class RandomForestAnalysis:
             plt.show()
 
     def run(self):
-        # Aplicar PCA se necessário
+        # 1. Clustering para análise exploratória e feature engineering
+        self.apply_clustering()
+        # 2. PCA se necessário
         self.apply_pca()
         
         # Treinar e avaliar o modelo

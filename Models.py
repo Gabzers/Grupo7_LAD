@@ -1,6 +1,5 @@
 # Projeto de Machine Learning - Objetivo Final
-# O objetivo deste projeto é a classificação dos tipos de ataques em redes IoT utilizando diferentes algoritmos de machine learning.
-# O modelo prevê a classe (tipo de ataque) para cada instância do dataset.
+# O objetivo deste projeto é a classificação dos tipos de ataques em redes IoT utilizando Random Forest.
 
 import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -13,19 +12,8 @@ from sklearn.cluster import KMeans
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, ConfusionMatrixDisplay
-from sklearn.svm import SVC
 
-# Importar as classes de análise
-from LogisticRegressionAnalysis import LogisticRegressionAnalysis
 from RandomForestAnalysis import RandomForestAnalysis
-from SVMAnalysis import SVMAnalysis
-from DecisionTreeAnalysis import DecisionTreeAnalysis
-from NaiveBayesAnalysis import NaiveBayesAnalysis
-from LinearRegressionAnalysis import LinearRegressionAnalysis
-from LassoAnalysis import LassoAnalysis
-from RidgeAnalysis import RidgeAnalysis
-from KNNAnalysis import KNNAnalysis
-from MLPAnalysis import MLPAnalysis
 
 def prepare_data():
     """Prepara os dados para treinamento e teste."""
@@ -59,43 +47,33 @@ def prepare_data():
     
     return X_train_scaled, X_test_scaled, y_train, y_test, le, X.columns
 
-def run_all_models_with_metrics(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names):
-    """Executa todos os modelos de análise e retorna métricas para gráficos comparativos."""
+def run_random_forest_with_metrics(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names):
+    """Executa apenas o modelo Random Forest e retorna métricas, incluindo Cross Validation."""
     from sklearn.metrics import accuracy_score, f1_score
-    models = [
-        ("Logistic Regression", LogisticRegressionAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("Random Forest", RandomForestAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names=feature_names)),
-        ("SVM RBF", SVMAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, kernel='rbf')),
-        ("Decision Tree", DecisionTreeAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names=feature_names)),
-        ("Naive Bayes", NaiveBayesAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("KNN", KNNAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("MLP", MLPAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("Lasso", LassoAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("Ridge", RidgeAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le)),
-        ("Linear Regression", LinearRegressionAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le))
-    ]
-    results = []
-    for name, model in models:
-        print(f"\nExecutando {name}...")
-        import time
-        start = time.time()
-        model.apply_pca()
-        model.model.fit(model.X_train, model.y_train)
-        y_pred = model.model.predict(model.X_test)
-        end = time.time()
-        # Para regressão, converter para classificação
-        if "Regression" in name or "Lasso" in name or "Ridge" in name:
-            y_pred = y_pred.round().astype(int)
-        acc = accuracy_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='weighted')
-        results.append({
-            'name': name,
-            'accuracy': acc,
-            'f1_score': f1,
-            'time': end-start
-        })
-        print(f"{name} - Accuracy: {acc:.3f} | F1-score: {f1:.3f} | Tempo: {end-start:.2f}s")
-    return results
+    from sklearn.model_selection import cross_val_score
+    name = "Random Forest"
+    model = RandomForestAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names=feature_names)
+    print(f"\nExecutando {name}...")
+    start = time.time()
+    model.apply_pca()
+    model.model.fit(model.X_train, model.y_train)
+    y_pred = model.model.predict(model.X_test)
+    end = time.time()
+    acc = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='weighted')
+    print(f"{name} - Accuracy: {acc:.3f} | F1-score: {f1:.3f} | Tempo: {end-start:.2f}s")
+
+    # Cross Validation
+    print("\n--- Cross Validation (Random Forest) ---")
+    scores = cross_val_score(model.model, model.X_train, model.y_train, cv=5, scoring='accuracy')
+    print(f"Cross Validation - Accuracy média: {scores.mean():.3f} (+/- {scores.std():.3f})")
+
+    return [{
+        'name': name,
+        'accuracy': acc,
+        'f1_score': f1,
+        'time': end-start
+    }]
 
 def plot_comparative_graphs(results):
     import matplotlib.pyplot as plt
@@ -180,8 +158,8 @@ if __name__ == "__main__":
     # Preparar dados
     X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names = prepare_data()
     
-    # Executar todos os modelos e obter métricas
-    results = run_all_models_with_metrics(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names)
+    # Executar apenas Random Forest e obter métricas
+    results = run_random_forest_with_metrics(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names)
     plot_comparative_graphs(results)
     
     # Executar análises avançadas
