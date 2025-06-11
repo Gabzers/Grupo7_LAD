@@ -9,8 +9,13 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.decomposition import PCA
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
 
 # 1. Carregamento do dataset
 df = pd.read_csv("RT_IOT2022.csv")
@@ -140,6 +145,106 @@ plt.xlabel("Número de vizinhos (k)")
 plt.ylabel("Acurácia")
 plt.title("Análise do número ótimo de vizinhos para KNN")
 plt.show()
+
+# --- Análise do tempo de ajuste (fit time) por modelo ---
+fit_times = {}
+for name, model in models.items():
+    start = time.time()
+    if name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name:
+        model.fit(X_train_scaled, y_train)
+    else:
+        model.fit(X_train_scaled, y_train)
+    fit_times[name] = time.time() - start
+plt.figure()
+plt.barh(list(fit_times.keys()), list(fit_times.values()))
+plt.xlabel("Tempo de ajuste (s)")
+plt.title("Tempo de ajuste por modelo")
+plt.show()
+
+# --- PCA (SVD) e comparação de acurácia e tempo ---
+pca = PCA(n_components=0.95, svd_solver='full')
+X_train_pca = pca.fit_transform(X_train_scaled)
+X_test_pca = pca.transform(X_test_scaled)
+print(f"Redução de {X_train_scaled.shape[1]} para {X_train_pca.shape[1]} componentes principais.")
+
+fit_times_pca = {}
+scores_pca = {}
+for name, model in models.items():
+    start = time.time()
+    if name.startswith("Linear Regression") or "Ridge" in name or "Lasso" in name:
+        model.fit(X_train_pca, y_train)
+        y_pred = model.predict(X_test_pca).round().astype(int)
+    else:
+        model.fit(X_train_pca, y_train)
+        y_pred = model.predict(X_test_pca)
+    fit_times_pca[name] = time.time() - start
+    scores_pca[name] = model.score(X_test_pca, y_test)
+plt.figure()
+plt.barh(list(fit_times_pca.keys()), list(fit_times_pca.values()))
+plt.xlabel("Tempo de ajuste (s) com PCA")
+plt.title("Tempo de ajuste por modelo (PCA)")
+plt.show()
+plt.figure()
+plt.barh(list(scores_pca.keys()), list(scores_pca.values()))
+plt.xlabel("Acurácia com PCA")
+plt.title("Acurácia dos modelos após PCA")
+plt.show()
+
+# --- Clustering: KMeans e Hierarchical ---
+# Usar apenas features (sem target)
+X_cluster = X_train_scaled
+
+# KMeans: análise do número ótimo de clusters (Elbow method)
+inertia = []
+K = range(2, 11)
+for k in K:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    kmeans.fit(X_cluster)
+    inertia.append(kmeans.inertia_)
+plt.figure()
+plt.plot(K, inertia, marker='o')
+plt.xlabel("Número de clusters")
+plt.ylabel("Inércia")
+plt.title("Método do cotovelo para KMeans")
+plt.show()
+
+# Hierarchical clustering: dendrograma
+linked = linkage(X_cluster[:200], method='ward')  # Usar amostra para performance
+plt.figure(figsize=(10, 7))
+dendrogram(linked)
+plt.title("Dendrograma (Hierarchical Clustering)")
+plt.xlabel("Amostras")
+plt.ylabel("Distância")
+plt.show()
+
+# --- Cross Validation ---
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+best_model = LogisticRegression(max_iter=1000)
+cv_scores = cross_val_score(best_model, X_train_scaled, y_train, cv=cv, scoring='accuracy')
+print("Acurácias na validação cruzada:", cv_scores)
+print("Média:", cv_scores.mean())
+
+# --- Análise de métricas (Precision, Recall, F1) com gráficos ---
+from sklearn.metrics import precision_recall_fscore_support
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train_scaled, y_train)
+y_pred = model.predict(X_test_scaled)
+precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred, labels=range(len(le.classes_)))
+plt.figure(figsize=(10,5))
+plt.bar(le.classes_, precision, alpha=0.7, label='Precision')
+plt.bar(le.classes_, recall, alpha=0.7, label='Recall')
+plt.bar(le.classes_, f1, alpha=0.7, label='F1-score')
+plt.ylabel("Score")
+plt.title("Precision, Recall e F1-score por classe (Random Forest)")
+plt.legend()
+plt.show()
+
+# --- Dashboard: aplicação preditiva/classificadora (exemplo simples) ---
+def predict_attack_type(input_data):
+    input_scaled = scaler.transform([input_data])
+    pred = model.predict(input_scaled)
+    return le.inverse_transform(pred)[0]
 
 # O classification report mostra várias métricas importantes para avaliar o desempenho do modelo:
 # - precision: Proporção de predições positivas corretas para cada classe.
