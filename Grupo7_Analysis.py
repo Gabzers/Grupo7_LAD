@@ -8,6 +8,9 @@ import ttkbootstrap as ttk
 from tkinter import ttk
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from joblib import load, dump
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
 
 # Configure the style of the plots
 sns.set(style="whitegrid")
@@ -754,6 +757,49 @@ def show_all_variables():
     text_widget.config(yscrollcommand=scrollbar.set)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+def predict_attack_types():
+    try:
+        # Carregar modelo treinado
+        model = load("random_forest_model.joblib")
+        # Carregar dados
+        df_pred = load_csv(os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv"))
+        # Remover colunas desnecessárias
+        if "Unnamed: 0" in df_pred.columns:
+            df_pred.drop(columns=["Unnamed: 0"], inplace=True)
+        # Codificar colunas categóricas (exceto target)
+        categorical_cols = df_pred.select_dtypes(include=["object"]).columns.tolist()
+        if "Attack_type" in categorical_cols:
+            categorical_cols.remove("Attack_type")
+        df_pred = pd.get_dummies(df_pred, columns=categorical_cols)
+        # Codificar variável alvo (para comparar, se existir)
+        le = LabelEncoder()
+        if "Attack_type" in df_pred.columns:
+            df_pred["Attack_type"] = le.fit_transform(df_pred["Attack_type"])
+            X_pred = df_pred.drop("Attack_type", axis=1)
+        else:
+            X_pred = df_pred
+        # Normalização (ajustar para usar scaler do treino se disponível)
+        scaler = StandardScaler()
+        X_pred_scaled = scaler.fit_transform(X_pred)
+        # Predição
+        predicoes = model.predict(X_pred_scaled)
+        # Adicionar resultados ao DataFrame
+        df_pred["Predicted_Attack"] = le.inverse_transform(predicoes)
+        # Salvar resultados
+        df_pred.to_csv("resultados_com_predicoes.csv", index=False)
+        # Mostrar resumo em janela Tkinter
+        summary = df_pred["Predicted_Attack"].value_counts().to_string()
+        result_window = tk.Toplevel(root)
+        result_window.title("Prediction Summary")
+        tk.Label(result_window, text="Resumo das Predições (Predicted_Attack)", font=("Arial", 14, "bold")).pack(pady=10)
+        text_widget = tk.Text(result_window, wrap=tk.WORD, font=("Arial", 12), height=20, width=60)
+        text_widget.insert(tk.END, summary)
+        text_widget.config(state=tk.DISABLED)
+        text_widget.pack(padx=10, pady=10)
+        tk.Label(result_window, text="Resultados salvos em 'resultados_com_predicoes.csv'", font=("Arial", 10, "italic"), fg="green").pack(pady=5)
+    except Exception as e:
+        messagebox.showerror("Prediction Error", str(e))
+
 # Main Tkinter window
 if __name__ == "__main__":
     file_path = os.path.join(os.path.dirname(__file__), "RT_IOT2022.csv")
@@ -833,6 +879,13 @@ if __name__ == "__main__":
         text="List of Variables and Explanations",
         command=show_all_variables,
         bootstyle="outline-primary",  # Unified color with title
+    ).pack(pady=10, fill="x")
+
+    ttk.Button(
+        general_column,
+        text="Prever Tipo de Ataque",
+        command=predict_attack_types,
+        bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
 
     # Graphical Analysis Section
