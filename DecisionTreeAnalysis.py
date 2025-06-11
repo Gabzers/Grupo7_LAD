@@ -35,3 +35,9 @@ class DecisionTreeAnalysis:
             plt.title("Árvore de Decisão (max_depth=2)")
             plt.show()
         print("Gini feature importances:", self.model.feature_importances_)
+
+if __name__ == "__main__":
+    from Models import X_train_scaled, X_test_scaled, y_train, y_test, le, X
+    dt_analysis = DecisionTreeAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names=X.columns)
+    dt_analysis.run()
+
