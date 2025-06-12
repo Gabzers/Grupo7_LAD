@@ -146,7 +146,7 @@ def run_advanced_analysis(X_train_scaled, X_test_scaled, y_train, y_test, le):
     # Hierarchical Clustering
     print("\n--- Hierarchical Clustering ---")
     plt.figure(figsize=(10, 7))
-    linked = linkage(X_train_scaled[:500], 'ward')
+    linked = linkage(X_train_scaled[:10], 'ward')
     dendrogram(linked)
     plt.title('Dendrograma (Hierarchical Clustering)')
     plt.xlabel('Amostras')
