@@ -183,7 +183,27 @@ HTML = """
         .kpi .value { font-size: 2.6em; font-weight: bold; color: #fff;}
         .kpi .label { font-size: 1.2em; color: #e0e6f0;}
         .charts-row { display: flex; gap: 30px; margin-bottom: 30px;}
-        .chart-box { flex: 1; background: #232936; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px #0004; height: 340px; min-height: 340px; max-height: 340px;}
+        .chart-box { 
+            flex: 1; 
+            background: linear-gradient(135deg, #232936 0%, #2c3442 100%); 
+            border-radius: 15px; 
+            padding: 25px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05); 
+            height: 360px; 
+            min-height: 360px; 
+            max-height: 360px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(124,58,237,0.5), transparent);
+        }
         .chart-box > div { height: 100% !important;}
         h2 { color: #fff; margin-top: 30px; }
         .attack-list-container { max-height: 420px; overflow-y: auto; border-radius: 10px; background: #181c24; box-shadow: 0 1px 8px #0002; }
@@ -398,37 +418,30 @@ HTML = """
         }
         
         function updateCharts(suffix, data) {
-            // Layout com altura fixa
-            const fixedLayout = {
-                height: 300,
-                width: null,
-                autosize: true,
-                paper_bgcolor: "#232936",
-                plot_bgcolor: "#232936",
-                font: {color: "#f8fafc"},
-                margin: { l: 40, r: 40, t: 40, b: 40 }
-            };
-            
-            // Atualizar layout do gráfico de barras
-            const barLayout = Object.assign({}, data.attack_bar.layout, fixedLayout, {
-                title: "Frequência dos Tipos de Ataque",
-                xaxis: {title: "Tipo de Ataque", color: "#f8fafc"},
-                yaxis: {title: "Qtd", color: "#f8fafc"}
-            });
-            
-            // Atualizar layout do gráfico de pizza
-            const pieLayout = Object.assign({}, data.empresa_pie.layout, fixedLayout, {
-                title: "Distribuição por Empresa"
-            });
-            
             const config = {
                 displayModeBar: false, 
                 responsive: true,
-                staticPlot: false
+                staticPlot: false,
+                modeBarButtonsToRemove: ['pan2d','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d'],
+                doubleClick: false
             };
             
-            Plotly.react('attack-bar-' + suffix, data.attack_bar.data, barLayout, config);
-            Plotly.react('empresa-pie-' + suffix, data.empresa_pie.data, pieLayout, config);
+            // Usar os dados com layout já otimizado do backend
+            Plotly.react('attack-bar-' + suffix, data.attack_bar.data, data.attack_bar.layout, config);
+            Plotly.react('empresa-pie-' + suffix, data.empresa_pie.data, data.empresa_pie.layout, config);
+            
+            // Adicionar animação suave
+            setTimeout(() => {
+                if (document.getElementById('attack-bar-' + suffix)) {
+                    Plotly.animate('attack-bar-' + suffix, {
+                        data: data.attack_bar.data,
+                        layout: data.attack_bar.layout
+                    }, {
+                        transition: { duration: 500, easing: 'cubic-in-out' },
+                        frame: { duration: 500 }
+                    });
+                }
+            }, 100);
         }
 
         function attachDetailsBtns(suffix) {
@@ -598,43 +611,109 @@ def get_attack_stats(history):
         attack_types, counts = np.unique(labels, return_counts=True)
     else:
         attack_types, counts = [], []
+    
+    # Cores gradientes para o gráfico de barras
+    bar_colors = [
+        "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57",
+        "#ff9ff3", "#54a0ff", "#5f27cd", "#00d2d3", "#ff9f43",
+        "#a55eea", "#26de81"
+    ]
+    
     attack_bar = dict(
         data=[dict(
             type="bar",
             x=attack_types.tolist(),
             y=counts.tolist(),
-            marker=dict(color="#a78bfa")
+            marker=dict(
+                color=bar_colors[:len(attack_types)],
+                line=dict(color='rgba(255,255,255,0.1)', width=1),
+                opacity=0.9
+            ),
+            text=counts.tolist(),
+            textposition='auto',
+            textfont=dict(color='white', size=12, family='Segoe UI')
         )],
         layout=dict(
-            title="Frequência dos Tipos de Ataque",
-            xaxis=dict(title="Tipo de Ataque"),
-            yaxis=dict(title="Qtd"),
+            title=dict(
+                text="Frequência dos Tipos de Ataque",
+                font=dict(size=18, color="#ffffff", family='Segoe UI'),
+                x=0.5
+            ),
+            xaxis=dict(
+                title=dict(text="Tipo de Ataque", font=dict(size=14, color="#e0e6f0")),
+                tickfont=dict(size=10, color="#b0b8c1"),
+                gridcolor="rgba(255,255,255,0.1)",
+                showgrid=True
+            ),
+            yaxis=dict(
+                title=dict(text="Quantidade", font=dict(size=14, color="#e0e6f0")),
+                tickfont=dict(size=12, color="#b0b8c1"),
+                gridcolor="rgba(255,255,255,0.1)",
+                showgrid=True
+            ),
             height=300,
             paper_bgcolor="#232936",
-            plot_bgcolor="#232936",
-            font=dict(color="#f8fafc")
+            plot_bgcolor="rgba(35,41,54,0.8)",
+            font=dict(color="#f8fafc", family='Segoe UI'),
+            margin=dict(l=50, r=30, t=50, b=80),
+            showlegend=False,
+            hovermode='closest'
         )
     )
+    
     empresas_list = [x["empresa"] for x in history]
     if empresas_list:
         emp_types, emp_counts = np.unique(empresas_list, return_counts=True)
     else:
         emp_types, emp_counts = [], []
+    
+    # Cores vibrantes para o gráfico de pizza
+    pie_colors = [
+        "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57",
+        "#ff9ff3", "#54a0ff", "#5f27cd", "#00d2d3", "#ff9f43",
+        "#a55eea", "#26de81", "#fd79a8", "#6c5ce7", "#fdcb6e"
+    ]
+    
     empresa_pie = dict(
         data=[dict(
             type="pie",
             labels=emp_types.tolist(),
             values=emp_counts.tolist(),
             hole=0.4,
-            marker=dict(colors=["#a78bfa", "#ff5c5c", "#27ae60", "#b0b8c1", "#f8fafc", "#232936", "#007bff", "#c0392b", "#181c24", "#2c3442"])
+            marker=dict(
+                colors=pie_colors[:len(emp_types)],
+                line=dict(color='rgba(255,255,255,0.2)', width=2)
+            ),
+            textfont=dict(size=12, color='white', family='Segoe UI'),
+            textinfo='label+percent',
+            textposition='auto',
+            hovertemplate='<b>%{label}</b><br>Ataques: %{value}<br>Percentual: %{percent}<extra></extra>',
+            pull=[0.02] * len(emp_types)  # Pequena separação entre fatias
         )],
         layout=dict(
-            title="Distribuição por Empresa",
+            title=dict(
+                text="Distribuição por Empresa",
+                font=dict(size=18, color="#ffffff", family='Segoe UI'),
+                x=0.5
+            ),
             height=300,
             paper_bgcolor="#232936",
-            font=dict(color="#f8fafc")
+            plot_bgcolor="rgba(35,41,54,0.8)",
+            font=dict(color="#f8fafc", family='Segoe UI'),
+            margin=dict(l=20, r=20, t=50, b=20),
+            showlegend=True,
+            legend=dict(
+                orientation="v",
+                x=1.05,
+                y=0.5,
+                font=dict(size=10, color="#e0e6f0"),
+                bgcolor="rgba(35,41,54,0.8)",
+                bordercolor="rgba(255,255,255,0.1)",
+                borderwidth=1
+            )
         )
     )
+    
     # Para filtros, envie até 50 ataques recentes, com índice real
     last_50 = list(reversed(history))[:50]
     history_json = []
