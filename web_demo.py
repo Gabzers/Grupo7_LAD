@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from flask import Flask, render_template_string, jsonify
+from flask import Flask, render_template_string, jsonify, request
 from sklearn.preprocessing import StandardScaler
 from RandomForestAnalysis import RandomForestAnalysis
 import random
@@ -9,6 +9,7 @@ import time
 import plotly
 import plotly.graph_objs as go
 import json
+import os
 
 # Carregar variáveis do dataset
 df = pd.read_csv("RT_IOT2022.csv")
@@ -64,35 +65,9 @@ EMPRESAS = [
     "ZetaSystems", "ThetaCorp", "LambdaSolutions", "SigmaIoT", "OmegaNetworks"
 ]
 
-# Histórico de ataques recebidos (agora armazena também as features enviadas)
-attack_history = []
+# --- Mantém apenas a simulação random para a aba Random ---
 attack_history_random = []
 
-# Índice global para percorrer o dataset sequencialmente
-current_dataset_index = 0
-
-# Função para gerar dados sequenciais do dataset
-def generate_sequential_data():
-    global current_dataset_index
-    
-    # Se chegou ao fim do dataset, reinicia do início
-    if current_dataset_index >= len(df):
-        current_dataset_index = 0
-    
-    # Pega a linha atual do dataset
-    row = df.iloc[current_dataset_index]
-    sequential_row = row[feature_names].to_dict()
-    
-    # Adiciona campo empresa simulada
-    empresa = random.choice(EMPRESAS)
-    sequential_row['empresa'] = empresa
-    
-    # Incrementa o índice para a próxima iteração
-    current_dataset_index += 1
-    
-    return sequential_row
-
-# Função para gerar dados random (versão anterior)
 def generate_random_data():
     # Escolhe um ataque conforme a distribuição desejada
     chosen_attack = np.random.choice(attack_labels, p=attack_weights)
@@ -111,23 +86,6 @@ def generate_random_data():
 
 def simulate_attack_loop():
     while True:
-        # Dados sequenciais
-        data_seq = generate_sequential_data()
-        X_input_seq = pd.DataFrame([data_seq])[feature_names]
-        X_input_scaled_seq = scaler.transform(X_input_seq)
-        pred_seq = rf_analysis.model.predict(X_input_scaled_seq)[0]
-        pred_label_seq = le.inverse_transform([pred_seq])[0]
-        empresa_seq = data_seq['empresa']
-        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        attack_history.append({
-            "timestamp": timestamp,
-            "empresa": empresa_seq,
-            "pred_label": pred_label_seq,
-            "is_attack": pred_label_seq.lower() != "normal",
-            "features": data_seq
-        })
-        
         # Dados aleatórios
         data_rand = generate_random_data()
         X_input_rand = pd.DataFrame([data_rand])[feature_names]
@@ -135,7 +93,7 @@ def simulate_attack_loop():
         pred_rand = rf_analysis.model.predict(X_input_scaled_rand)[0]
         pred_label_rand = le.inverse_transform([pred_rand])[0]
         empresa_rand = data_rand['empresa']
-        
+        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
         attack_history_random.append({
             "timestamp": timestamp,
             "empresa": empresa_rand,
@@ -143,20 +101,20 @@ def simulate_attack_loop():
             "is_attack": pred_label_rand.lower() != "normal",
             "features": data_rand
         })
-        
-        # Limita histórico para os últimos 100 ataques
-        if len(attack_history) > 100:
-            attack_history.pop(0)
-        if len(attack_history_random) > 100:
-            attack_history_random.pop(0)
-            
+        # Remove the limit - let it grow unlimited
+        # if len(attack_history_random) > 100:
+        #     attack_history_random.pop(0)
         time.sleep(1.5)
 
-# Inicia thread de simulação de ataques
 threading.Thread(target=simulate_attack_loop, daemon=True).start()
 
-# Flask app
+# --- CSV upload e análise para a aba Sequential ---
+UPLOAD_FOLDER = "uploaded_csvs"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+uploaded_csv_data = {"df": None, "filename": None}
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 HTML = """
 <!DOCTYPE html>
@@ -232,6 +190,19 @@ HTML = """
         /* Scrollbar dark */
         ::-webkit-scrollbar { width: 10px; background: #232936;}
         ::-webkit-scrollbar-thumb { background: #181c24; border-radius: 8px;}
+        .upload-box { background: #232936; border-radius: 12px; padding: 28px 36px; margin-bottom: 30px; text-align: center; box-shadow: 0 2px 8px #0003;}
+        .upload-label { color: #a78bfa; font-size: 1.2em; font-weight: bold; margin-bottom: 10px; display: block;}
+        .upload-input { padding: 10px 18px; border-radius: 8px; border: 1.5px solid #7c3aed; background: #181c24; color: #fff; font-size: 1em; margin-bottom: 10px;}
+        .upload-btn { background: #7c3aed; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: background 0.2s;}
+        .upload-btn:hover { background: #a78bfa; }
+        .csv-info { color: #b0b8c1; margin-bottom: 10px; }
+        .sortable { cursor: pointer; }
+        .sort-arrow { font-size: 0.9em; margin-left: 4px; }
+        .csv-table-container { max-height: 420px; overflow-y: auto; border-radius: 10px; background: #181c24; box-shadow: 0 1px 8px #0002; margin-top: 18px;}
+        .csv-table { width: 100%; border-collapse: collapse; }
+        .csv-table th, .csv-table td { padding: 10px 14px; border-bottom: 1px solid #232936;}
+        .csv-table th { background: #232936; color: #b0b8c1; font-size: 1.1em;}
+        .csv-table tr:hover { background: #23293655; }
         @media (max-width: 900px) {
             .charts-row { flex-direction: column; }
             .kpi-row { flex-direction: column; gap: 12px;}
@@ -243,62 +214,36 @@ HTML = """
 <body>
     <div class="container">
         <h1>IoT Attack Monitoring Dashboard</h1>
-        
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('sequential')">Sequential Data</div>
+            <div class="tab active" onclick="switchTab('sequential')">Sequential Data (CSV Analysis)</div>
             <div class="tab" onclick="switchTab('random')">Random Data</div>
         </div>
-        
         <!-- Sequential Tab Content -->
         <div id="sequential-content" class="tab-content active">
-            <div class="kpi-row">
-                <div class="kpi">
-                    <div class="value" id="kpi-total-seq">-</div>
-                    <div class="label">Total Packets Received</div>
-                </div>
-                <div class="kpi">
-                    <div class="value" id="kpi-attacks-seq">-</div>
-                    <div class="label">Detected Attacks</div>
-                </div>
-                <div class="kpi">
-                    <div class="value" id="kpi-empresas-seq">-</div>
-                    <div class="label">Monitored Companies</div>
-                </div>
-                <div class="kpi">
-                    <div class="value" id="kpi-last-seq">-</div>
-                    <div class="label">Last Attack</div>
-                </div>
+            <div class="upload-box">
+                <form id="csv-upload-form" enctype="multipart/form-data">
+                    <label class="upload-label">Upload CSV file (e.g., resultados_com_predicoes.csv):</label>
+                    <input class="upload-input" type="file" name="csvfile" accept=".csv" required>
+                    <button class="upload-btn" type="submit">Upload & Analyze</button>
+                </form>
+                <div id="csv-info" class="csv-info"></div>
             </div>
-            <div class="charts-row">
-                <div class="chart-box">
-                    <div id="attack-bar-seq"></div>
+            <div id="csv-dashboard" style="display:none;">
+                <div class="kpi-row" id="csv-kpis"></div>
+                <div class="charts-row">
+                    <div class="chart-box">
+                        <div id="csv-attack-bar"></div>
+                    </div>
+                    <div class="chart-box">
+                        <div id="csv-attack-pie"></div>
+                    </div>
                 </div>
-                <div class="chart-box">
-                    <div id="empresa-pie-seq"></div>
-                </div>
-            </div>
-            <h2>Latest Received Attacks (Sequential)</h2>
-            <div class="attack-list-container">
-                <div class="filter-row">
-                    <span class="filter-label">Company:</span>
-                    <select id="filter-empresa-seq" class="filter-select"><option value="">All</option></select>
-                    <span class="filter-label">Attack Type:</span>
-                    <select id="filter-tipo-seq" class="filter-select"><option value="">All</option></select>
-                    <span class="filter-label">Status:</span>
-                    <select id="filter-status-seq" class="filter-select">
-                        <option value="">All</option>
-                        <option value="Ataque">Attack</option>
-                        <option value="Normal">Normal</option>
-                    </select>
-                    <span class="filter-label">Search:</span>
-                    <input id="filter-busca-seq" class="filter-input" type="text" placeholder="Search by timestamp...">
-                </div>
-                <div id="history-table-div-seq">
-                    {{history_table|safe}}
+                <h2>Attack Type Summary Table</h2>
+                <div class="csv-table-container">
+                    <div id="csv-table-div"></div>
                 </div>
             </div>
         </div>
-        
         <!-- Random Tab Content -->
         <div id="random-content" class="tab-content">
             <div class="kpi-row">
@@ -359,6 +304,89 @@ HTML = """
     </div>
     
     <script>
+        // --- CSV Upload & Dashboard ---
+        let csvTableData = [];
+        let csvSortCol = "count";
+        let csvSortDir = "desc";
+        document.getElementById('csv-upload-form').onsubmit = function(e){
+            e.preventDefault();
+            let formData = new FormData(this);
+            document.getElementById('csv-info').textContent = "Uploading and analyzing...";
+            fetch('/api/upload_csv', {method:'POST', body:formData})
+            .then(r=>r.json())
+            .then(function(data){
+                if(data.status === "ok") {
+                    document.getElementById('csv-info').textContent = "File: " + data.filename + " (" + data.n_rows + " rows)";
+                    showCsvDashboard(data);
+                } else {
+                    document.getElementById('csv-info').textContent = "Error: " + data.error;
+                    document.getElementById('csv-dashboard').style.display = "none";
+                }
+            });
+        };
+        function showCsvDashboard(data) {
+            document.getElementById('csv-dashboard').style.display = "";
+            // KPIs
+            let kpiHtml = `
+                <div class="kpi">
+                    <div class="value">${data.n_rows}</div>
+                    <div class="label">Total Packets</div>
+                </div>
+                <div class="kpi">
+                    <div class="value">${data.n_attacks}</div>
+                    <div class="label">Detected Attacks</div>
+                </div>
+                <div class="kpi">
+                    <div class="value">${data.n_normals}</div>
+                    <div class="label">Normal Packets</div>
+                </div>
+                <div class="kpi">
+                    <div class="value">${data.n_types}</div>
+                    <div class="label">Attack Types</div>
+                </div>
+            `;
+            document.getElementById('csv-kpis').innerHTML = kpiHtml;
+            // Charts
+            Plotly.react('csv-attack-bar', data.attack_bar.data, data.attack_bar.layout, {displayModeBar:false, responsive:true});
+            Plotly.react('csv-attack-pie', data.attack_pie.data, data.attack_pie.layout, {displayModeBar:false, responsive:true});
+            // Table
+            csvTableData = data.table_data;
+            csvSortCol = "count";
+            csvSortDir = "desc";
+            renderCsvTable();
+        }
+        function renderCsvTable() {
+            let sorted = [...csvTableData];
+            sorted.sort((a,b)=>{
+                if(csvSortCol==="count") return csvSortDir==="desc"?b.count-a.count:a.count-b.count;
+                if(csvSortCol==="percent") return csvSortDir==="desc"?b.percent-a.percent:a.percent-b.percent;
+                if(csvSortCol==="type") return csvSortDir==="desc"?b.type.localeCompare(a.type):a.type.localeCompare(b.type);
+                return 0;
+            });
+            let th = (col, label) => `<th class="sortable" onclick="sortCsvTable('${col}')">${label}${csvSortCol===col?'<span class="sort-arrow">'+(csvSortDir==="desc"?"&#8595;":"&#8593;")+'</span>':''}</th>`;
+            let html = `<table class="csv-table">
+                <tr>
+                    ${th('type','Attack Type')}
+                    ${th('count','Count')}
+                    ${th('percent','Percent')}
+                </tr>`;
+            sorted.forEach(row=>{
+                let row_class = row.type.toLowerCase()==="normal" ? "normal-row" : "attack-row";
+                html += `<tr class="${row_class}">
+                    <td>${row.type}</td>
+                    <td>${row.count}</td>
+                    <td>${row.percent.toFixed(2)}%</td>
+                </tr>`;
+            });
+            html += "</table>";
+            document.getElementById('csv-table-div').innerHTML = html;
+        }
+        window.sortCsvTable = function(col) {
+            if(csvSortCol===col) csvSortDir = csvSortDir==="desc"?"asc":"desc";
+            else { csvSortCol=col; csvSortDir="desc"; }
+            renderCsvTable();
+        }
+        // --- Tabs and random tab logic (unchanged) ---
         let allRowsSeq = [], allRowsRand = [];
         let lastFiltersSeq = {empresa: "", tipo: "", status: "", busca: ""};
         let lastFiltersRand = {empresa: "", tipo: "", status: "", busca: ""};
@@ -387,18 +415,7 @@ HTML = """
         }
 
         function updateDashboard() {
-            // Update Sequential
-            fetch('/api/attack_stats/sequential')
-            .then(r=>r.json())
-            .then(function(data){
-                updateKPIs('seq', data);
-                updateCharts('seq', data);
-                allRowsSeq = data.history_json;
-                updateFilters('seq');
-                filterTable('seq', true);
-            });
-            
-            // Update Random
+            // Only update Random tab automatically
             fetch('/api/attack_stats/random')
             .then(r=>r.json())
             .then(function(data){
@@ -556,47 +573,166 @@ HTML = """
 </html>
 """
 
-def render_history_table(history):
-    # Show up to 50 most recent attacks
-    last_50 = list(reversed(history))[:50]
-    table = """
-    <table class="history-table">
-        <tr>
-            <th>Timestamp</th>
-            <th>Company</th>
-            <th>Attack Type</th>
-            <th>Status</th>
-            <th>Details</th>
-        </tr>
-    """
-    for idx, row in enumerate(last_50):
-        row_class = "attack-row" if row["is_attack"] else "normal-row"
-        status = "Attack" if row["is_attack"] else "Normal"
-        real_idx = len(history) - 1 - idx
-        table += f"""
-        <tr class="{row_class}">
-            <td>{row['timestamp']}</td>
-            <td class="empresa-cell">{row['empresa']}</td>
-            <td>{row['pred_label']}</td>
-            <td>{status}</td>
-            <td><button class="details-btn" data-idx="{real_idx}">View Details</button></td>
-        </tr>
-        """
-    table += "</table>"
-    return table
+# --- API para upload e análise do CSV ---
+@app.route("/api/upload_csv", methods=["POST"])
+def upload_csv():
+    if "csvfile" not in request.files:
+        return jsonify({"status": "error", "error": "No file part"})
+    file = request.files["csvfile"]
+    if file.filename == "":
+        return jsonify({"status": "error", "error": "No selected file"})
+    try:
+        filename = file.filename
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        df_csv = pd.read_csv(filepath)
+        uploaded_csv_data["df"] = df_csv
+        uploaded_csv_data["filename"] = filename
+        # --- Análise dos dados agrupando ataques por nome correto ---
+        col_pred = None
+        for c in df_csv.columns:
+            if "pred" in c.lower() or "attack_type" in c.lower():
+                col_pred = c
+                break
+        if col_pred is None:
+            return jsonify({"status":"error", "error":"No prediction/attack_type column found"})
+        total = len(df_csv)
+        # Se a coluna for numérica, tenta decodificar usando o LabelEncoder do modelo principal
+        col_values = df_csv[col_pred]
+        # Detecta se é numérica (int/float) e converte para string se necessário
+        if np.issubdtype(col_values.dtype, np.number):
+            # Usa o label encoder treinado no início do script
+            try:
+                decoded = le.inverse_transform(col_values.astype(int))
+                col_values = pd.Series(decoded, index=col_values.index)
+            except Exception:
+                # fallback: mostra como está
+                col_values = col_values.astype(str)
+        # Agrupa todos os ataques diferentes de "Normal" em "Attack"
+        grouped = col_values.apply(lambda x: "Normal" if str(x).lower() == "normal" else str(x))
+        type_counts = grouped.value_counts(dropna=False)
+        n_types = type_counts.shape[0]
+        n_attacks = type_counts.drop(labels=["Normal"], errors="ignore").sum() if "Normal" in type_counts else total-type_counts.get("Normal",0)
+        n_normals = type_counts.get("Normal", 0)
+        table_data = []
+        for t, cnt in type_counts.items():
+            percent = 100.0 * cnt / total if total else 0
+            table_data.append({"type": str(t), "count": int(cnt), "percent": percent})
+        # Gráfico de barras
+        bar_colors = [
+            "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57",
+            "#ff9ff3", "#54a0ff", "#5f27cd", "#00d2d3", "#ff9f43",
+            "#a55eea", "#26de81", "#fd79a8", "#6c5ce7", "#fdcb6e"
+        ]
+        attack_bar = dict(
+            data=[dict(
+                type="bar",
+                x=[x["type"] for x in table_data],
+                y=[x["count"] for x in table_data],
+                marker=dict(
+                    color=bar_colors[:len(table_data)],
+                    line=dict(color='rgba(255,255,255,0.1)', width=1),
+                    opacity=0.9
+                ),
+                text=[x["count"] for x in table_data],
+                textposition='auto',
+                textfont=dict(color='white', size=12, family='Segoe UI')
+            )],
+            layout=dict(
+                title=dict(
+                    text="Attack Type Frequency",
+                    font=dict(size=18, color="#ffffff", family='Segoe UI'),
+                    x=0.5
+                ),
+                xaxis=dict(
+                    title=dict(text="Attack Type", font=dict(size=14, color="#e0e6f0")),
+                    tickfont=dict(size=10, color="#b0b8c1"),
+                    gridcolor="rgba(255,255,255,0.1)",
+                    showgrid=True
+                ),
+                yaxis=dict(
+                    title=dict(text="Count", font=dict(size=14, color="#e0e6f0")),
+                    tickfont=dict(size=12, color="#b0b8c1"),
+                    gridcolor="rgba(255,255,255,0.1)",
+                    showgrid=True
+                ),
+                height=300,
+                paper_bgcolor="#232936",
+                plot_bgcolor="rgba(35,41,54,0.8)",
+                font=dict(color="#f8fafc", family='Segoe UI'),
+                margin=dict(l=50, r=30, t=50, b=80),
+                showlegend=False,
+                hovermode='closest'
+            )
+        )
+        # Gráfico treemap - substituído o gráfico de barras horizontal
+        pie_colors = [
+            "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57",
+            "#ff9ff3", "#54a0ff", "#5f27cd", "#00d2d3", "#ff9f43",
+            "#a55eea", "#26de81", "#fd79a8", "#6c5ce7", "#fdcb6e"
+        ]
+        
+        # Ordenar dados por contagem para melhor visualização
+        sorted_data = sorted(table_data, key=lambda x: x["count"], reverse=True)
+        
+        attack_pie = dict(
+            data=[dict(
+                type="treemap",
+                labels=[x["type"] for x in sorted_data],
+                values=[x["count"] for x in sorted_data],
+                parents=[""] * len(sorted_data),
+                textinfo="label+value+percent parent",
+                textfont=dict(size=12, color='white', family='Segoe UI'),
+                marker=dict(
+                    colors=pie_colors[:len(sorted_data)],
+                    line=dict(color='rgba(255,255,255,0.3)', width=2),
+                    colorscale='Viridis'
+                ),
+                hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percent: %{percentParent}<extra></extra>',
+                pathbar=dict(visible=False),
+                maxdepth=1
+            )],
+            layout=dict(
+                title=dict(
+                    text="Attack Type Distribution",
+                    font=dict(size=18, color="#ffffff", family='Segoe UI'),
+                    x=0.5
+                ),
+                height=300,
+                paper_bgcolor="#232936",
+                plot_bgcolor="rgba(35,41,54,0.8)",
+                font=dict(color="#f8fafc", family='Segoe UI'),
+                margin=dict(l=20, r=20, t=50, b=20),
+                hoverlabel=dict(
+                    bgcolor="rgba(35,41,54,0.9)",
+                    bordercolor="rgba(255,255,255,0.2)",
+                    font=dict(color="white", size=12)
+                )
+            )
+        )
+        return jsonify({
+            "status": "ok",
+            "filename": filename,
+            "n_rows": total,
+            "n_types": n_types,
+            "n_attacks": int(n_attacks),
+            "n_normals": int(n_normals),
+            "table_data": table_data,
+            "attack_bar": attack_bar,
+            "attack_pie": attack_pie
+        })
+    except Exception as ex:
+        return jsonify({"status": "error", "error": str(ex)})
 
+# --- Dashboard principal ---
 @app.route("/")
 def dashboard():
-    history_table = render_history_table(attack_history)
     return render_template_string(
         HTML,
-        history_table=history_table
+        history_table=""  # não mostra tabela na aba sequential
     )
 
-@app.route("/api/attack_stats/sequential")
-def attack_stats_sequential():
-    return get_attack_stats(attack_history)
-
+# --- Random tab APIs (inalteradas) ---
 @app.route("/api/attack_stats/random")
 def attack_stats_random():
     return get_attack_stats(attack_history_random)
@@ -616,7 +752,7 @@ def get_attack_stats(history):
     bar_colors = [
         "#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57",
         "#ff9ff3", "#54a0ff", "#5f27cd", "#00d2d3", "#ff9f43",
-        "#a55eea", "#26de81"
+        "#a55eea", "#26de81", "#fd79a8", "#6c5ce7", "#fdcb6e"
     ]
     
     attack_bar = dict(
@@ -676,19 +812,19 @@ def get_attack_stats(history):
     
     empresa_pie = dict(
         data=[dict(
-            type="pie",
+            type="sunburst",
             labels=emp_types.tolist(),
             values=emp_counts.tolist(),
-            hole=0.4,
+            parents=[""] * len(emp_types),
             marker=dict(
                 colors=pie_colors[:len(emp_types)],
                 line=dict(color='rgba(255,255,255,0.2)', width=2)
             ),
-            textfont=dict(size=12, color='white', family='Segoe UI'),
-            textinfo='label+percent',
-            textposition='auto',
-            hovertemplate='<b>%{label}</b><br>Ataques: %{value}<br>Percentual: %{percent}<extra></extra>',
-            pull=[0.02] * len(emp_types)  # Pequena separação entre fatias
+            textfont=dict(size=11, color='white', family='Segoe UI'),
+            textinfo='label+percent parent',
+            hovertemplate='<b>%{label}</b><br>Ataques: %{value}<br>Percentual: %{percentParent}<extra></extra>',
+            maxdepth=1,
+            branchvalues="total"
         )],
         layout=dict(
             title=dict(
@@ -701,15 +837,10 @@ def get_attack_stats(history):
             plot_bgcolor="rgba(35,41,54,0.8)",
             font=dict(color="#f8fafc", family='Segoe UI'),
             margin=dict(l=20, r=20, t=50, b=20),
-            showlegend=True,
-            legend=dict(
-                orientation="v",
-                x=1.05,
-                y=0.5,
-                font=dict(size=10, color="#e0e6f0"),
-                bgcolor="rgba(35,41,54,0.8)",
-                bordercolor="rgba(255,255,255,0.1)",
-                borderwidth=1
+            hoverlabel=dict(
+                bgcolor="rgba(35,41,54,0.9)",
+                bordercolor="rgba(255,255,255,0.2)",
+                font=dict(color="white", size=12)
             )
         )
     )
@@ -725,7 +856,7 @@ def get_attack_stats(history):
             "pred_label": row["pred_label"],
             "is_attack": row["is_attack"],
             "idx": real_idx
-        })
+        });
     return jsonify({
         "kpi_total": total,
         "kpi_attacks": attacks,
@@ -750,5 +881,29 @@ def attack_details_random(idx):
         return jsonify(features)
     return jsonify({"erro": "Ataque não encontrado"}), 404
 
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
+@app.route("/api/attack_details/sequential/<int:idx>")
+def attack_details_sequential(idx):
+    if 0 <= idx < len(attack_history):
+        features = attack_history[idx]["features"].copy()
+        return jsonify(features)
+    return jsonify({"erro": "Ataque não encontrado"}), 404
+
+@app.route("/api/attack_details/random/<int:idx>")
+def attack_details_random(idx):
+    if 0 <= idx < len(attack_history_random):
+        features = attack_history_random[idx]["features"].copy()
+        return jsonify(features)
+    return jsonify({"erro": "Ataque não encontrado"}), 404
+
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
