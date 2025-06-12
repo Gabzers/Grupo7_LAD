@@ -50,7 +50,7 @@ def prepare_data():
 def run_random_forest_with_metrics(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names):
     """Executa apenas o modelo Random Forest e retorna métricas, incluindo Cross Validation."""
     from sklearn.metrics import accuracy_score, f1_score
-    from sklearn.model_selection import cross_val_score
+    from sklearn.model_selection import cross_val_score, StratifiedKFold
     name = "Random Forest"
     model = RandomForestAnalysis(X_train_scaled, X_test_scaled, y_train, y_test, le, feature_names=feature_names)
     print(f"\nExecutando {name}...")
@@ -63,16 +63,21 @@ def run_random_forest_with_metrics(X_train_scaled, X_test_scaled, y_train, y_tes
     f1 = f1_score(y_test, y_pred, average='weighted')
     print(f"{name} - Accuracy: {acc:.3f} | F1-score: {f1:.3f} | Tempo: {end-start:.2f}s")
 
-    # Cross Validation
+    # Cross Validation (Crossfitting)
     print("\n--- Cross Validation (Random Forest) ---")
-    scores = cross_val_score(model.model, model.X_train, model.y_train, cv=5, scoring='accuracy')
-    print(f"Cross Validation - Accuracy média: {scores.mean():.3f} (+/- {scores.std():.3f})")
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = cross_val_score(model.model, model.X_train, model.y_train, cv=skf, scoring='accuracy')
+    print(f"Cross Validation - Accuracy média: {cv_scores.mean():.3f} (+/- {cv_scores.std():.3f})")
+    print(f"Scores individuais: {cv_scores}")
 
     return [{
         'name': name,
         'accuracy': acc,
         'f1_score': f1,
-        'time': end-start
+        'time': end-start,
+        'cv_mean': cv_scores.mean(),
+        'cv_std': cv_scores.std(),
+        'cv_scores': cv_scores
     }]
 
 def plot_comparative_graphs(results):
@@ -153,6 +158,18 @@ def run_advanced_analysis(X_train_scaled, X_test_scaled, y_train, y_test, le):
     rf = RandomForestClassifier(n_estimators=100, random_state=42)
     scores = cross_val_score(rf, X_train_scaled, y_train, cv=5, scoring='accuracy')
     print(f"Cross Validation (Random Forest) - Accuracy média: {scores.mean():.3f} (+/- {scores.std():.3f})")
+    print(f"Scores individuais dos folds: {scores}")
+
+    # Visualização dos scores dos folds
+    plt.figure(figsize=(8,4))
+    plt.bar(range(1, len(scores)+1), scores, color='skyblue')
+    plt.axhline(scores.mean(), color='red', linestyle='--', label=f'Média: {scores.mean():.3f}')
+    plt.xlabel('Fold')
+    plt.ylabel('Accuracy')
+    plt.title('Scores de Accuracy por Fold no Cross Validation')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     # Preparar dados
