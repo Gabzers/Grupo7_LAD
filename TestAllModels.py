@@ -41,30 +41,32 @@ class ModelTester:
         if "Unnamed: 0" in df.columns:
             df.drop(columns=["Unnamed: 0"], inplace=True)
         
-        # Codificar colunas categóricas
+        # Codificar colunas categóricas (ANTES do PCA)
         categorical_cols = df.select_dtypes(include=["object"]).columns.tolist()
         if "Attack_type" in categorical_cols:
             categorical_cols.remove("Attack_type")
         df = pd.get_dummies(df, columns=categorical_cols)
         
-        # Codificar target
+        # Codificar target (ANTES do PCA)
         self.le = LabelEncoder()
         df["Attack_type"] = self.le.fit_transform(df["Attack_type"])
         
-        # Separar features e target
+        # Separar features e target (ANTES do PCA)
         X = df.drop("Attack_type", axis=1)
         y = df["Attack_type"]
         self.feature_names = X.columns
         
-        # Split treino/teste
+        # Split treino/teste (ANTES do PCA)
         X_train, X_test, self.y_train, self.y_test = train_test_split(
             X, y, test_size=0.3, random_state=42, stratify=y
         )
         
-        # Normalização
+        # Normalização (ANTES do PCA)
         scaler = StandardScaler()
         self.X_train_scaled = scaler.fit_transform(X_train)
         self.X_test_scaled = scaler.transform(X_test)
+        
+        # ⚠️ PCA NÃO É APLICADO AQUI!
         
         print(f"✅ Dados preparados: {X_train.shape[0]} treino, {X_test.shape[0]} teste")
         print(f"📊 Features: {X_train.shape[1]}, Classes: {len(self.le.classes_)}")
@@ -152,6 +154,7 @@ class ModelTester:
         
         # Configurações de teste
         test_configs = [
+            # ⚠️ PCA É APLICADO AQUI, DENTRO DE CADA MODELO!
             (SVMAnalysis, "SVM (RBF)", {'kernel': 'rbf', 'use_pca': True, 'use_clustering': True}),
             (DecisionTreeAnalysis, "Decision Tree", {'use_pca': True, 'use_clustering': True}),
             (RandomForestAnalysis, "Random Forest", {'use_pca': True, 'use_clustering': True}),
