@@ -791,12 +791,12 @@ def predict_attack_types():
         summary = df_pred["Predicted_Attack"].value_counts().to_string()
         result_window = tk.Toplevel(root)
         result_window.title("Prediction Summary")
-        tk.Label(result_window, text="Resumo das Predições (Predicted_Attack)", font=("Arial", 14, "bold")).pack(pady=10)
+        tk.Label(result_window, text="Prediction Summary (Predicted_Attack)", font=("Arial", 14, "bold")).pack(pady=10)
         text_widget = tk.Text(result_window, wrap=tk.WORD, font=("Arial", 12), height=20, width=60)
         text_widget.insert(tk.END, summary)
         text_widget.config(state=tk.DISABLED)
         text_widget.pack(padx=10, pady=10)
-        tk.Label(result_window, text="Resultados salvos em 'resultados_com_predicoes.csv'", font=("Arial", 10, "italic"), fg="green").pack(pady=5)
+        tk.Label(result_window, text="Results saved in 'resultados_com_predicoes.csv'", font=("Arial", 10, "italic"), fg="green").pack(pady=5)
     except Exception as e:
         messagebox.showerror("Prediction Error", str(e))
 
@@ -883,7 +883,7 @@ if __name__ == "__main__":
 
     ttk.Button(
         general_column,
-        text="Prever Tipo de Ataque",
+        text="Predict Attack Type",
         command=predict_attack_types,
         bootstyle="outline-primary",
     ).pack(pady=10, fill="x")
