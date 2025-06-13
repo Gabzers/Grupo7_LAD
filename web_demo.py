@@ -771,18 +771,18 @@ def get_attack_stats(history):
         )],
         layout=dict(
             title=dict(
-                text="Frequência dos Tipos de Ataque",
+                text="Attack Type Frequency",
                 font=dict(size=18, color="#ffffff", family='Segoe UI'),
                 x=0.5
             ),
             xaxis=dict(
-                title=dict(text="Tipo de Ataque", font=dict(size=14, color="#e0e6f0")),
+                title=dict(text="Attack Type", font=dict(size=14, color="#e0e6f0")),
                 tickfont=dict(size=10, color="#b0b8c1"),
                 gridcolor="rgba(255,255,255,0.1)",
                 showgrid=True
             ),
             yaxis=dict(
-                title=dict(text="Quantidade", font=dict(size=14, color="#e0e6f0")),
+                title=dict(text="Count", font=dict(size=14, color="#e0e6f0")),
                 tickfont=dict(size=12, color="#b0b8c1"),
                 gridcolor="rgba(255,255,255,0.1)",
                 showgrid=True
@@ -822,13 +822,13 @@ def get_attack_stats(history):
             ),
             textfont=dict(size=11, color='white', family='Segoe UI'),
             textinfo='label+percent parent',
-            hovertemplate='<b>%{label}</b><br>Ataques: %{value}<br>Percentual: %{percentParent}<extra></extra>',
+            hovertemplate='<b>%{label}</b><br>Attacks: %{value}<br>Percent: %{percentParent}<extra></extra>',
             maxdepth=1,
             branchvalues="total"
         )],
         layout=dict(
             title=dict(
-                text="Distribuição por Empresa",
+                text="Company Distribution",
                 font=dict(size=18, color="#ffffff", family='Segoe UI'),
                 x=0.5
             ),
